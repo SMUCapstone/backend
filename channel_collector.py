@@ -1,10 +1,7 @@
-
-# 모듈 
-import pandas as pd 
 from bs4 import BeautifulSoup 
 from selenium import webdriver 
+from selenium.webdriver.common.by import By 
 from webdriver_manager.chrome import ChromeDriverManager 
-from tqdm import tqdm 
 import time 
 import re 
 
@@ -13,14 +10,11 @@ def comment_scrap(url, driver):
     data_list = [] 
     driver.get(url) 
     # 스크롤 내리기 
-    body = driver.find_element_by_tag_name('body') 
     last_page_height = driver.execute_script("return document.documentElement.scrollHeight") 
     while True: 
         driver.execute_script("window.scrollTo(0, document.documentElement.scrollHeight);") 
-        # driver.execute_script("window.scrollTo(0,1000)")
         time.sleep(2)
         new_page_height = driver.execute_script("return document.documentElement.scrollHeight") 
-        # print(new_page_height, last_page_height)
         if new_page_height == last_page_height: 
             break
         last_page_height = new_page_height
@@ -32,8 +26,8 @@ def comment_scrap(url, driver):
     for j in range(len(comments_list)): 
         ## 댓글 내용 
         comment = comments_list[j].find('yt-formatted-string', {'id': 'content-text'}).text 
-        comment = comment.replace('\n', '')         # 줄 바뀜 없애기 
-        comment = comment.replace('\t', '')         # 탭 줄이기 
+        comment = comment.replace('\n', '')          
+        comment = comment.replace('\t', '')        
         ## 유튜브 id 
         youtube_id = comments_list[j].find('a', {'id': 'author-text'}).span.text 
         youtube_id = youtube_id.replace('\n', '') # 줄 바뀜 없애기 
@@ -49,7 +43,7 @@ def comment_scrap(url, driver):
             like_num = 0 
         data = {'comment': comment, 'youtube_id': youtube_id, 'like_num': like_num} 
         data_list.append(data) 
-
+    #### 혜원님이 DB 만들어주시면 DB에 올리는 함수 호출
     return data_list
 
 def initial():
@@ -64,9 +58,15 @@ def initial():
     return driver
 
 def channel_collector(tasklist, url, driver):
-    
     # 크롤링 목표 : 해당 채널에 속한 영상의 url, 썸네일, 제목, 조회수, 댓글 수
     driver.get(url) 
+    driver.implicitly_wait(5)
+    # youtuber_ID, channel_name, profile_img
+    container = driver.find_element(By.CSS_SELECTOR, "#channel-header-container")
+    profile_img = container.find_element(By.CSS_SELECTOR, "#img").get_attribute("src")
+    channel_name = container.find_element(By.CSS_SELECTOR, "#text").text
+    youtuber_ID = url.split('/')[4]
+    print(profile_img, channel_name, youtuber_ID)
     # 스크롤 내리기 
     last_page_height = driver.execute_script("return document.documentElement.scrollHeight") 
     elements = []
@@ -87,40 +87,39 @@ def channel_collector(tasklist, url, driver):
         if new_page_height == last_page_height: 
             break
         last_page_height = new_page_height
-    # html0 = driver.page_source 
-    # html = BeautifulSoup(html0, 'html.parser') 
+
+    html0 = driver.page_source 
+    html = BeautifulSoup(html0, 'html.parser') 
+    video_list = html.findAll('ytd-grid-video-renderer', {'class': 'style-scope ytd-grid-renderer'})
+
     
 
-
-    for source in elements: 
+    for j in range(len(video_list)): 
         ##  url,
-        video_url = source.find_element_by_css_selector('#thumbnail').get_attribute('href') #a 태그
+        video_url = video_list[j].find('a', {'id': 'video-title'}).get('href') #find_element_by_css_selector('#thumbnail').get_attribute('href') #a 태그
+        video_url = "https://www.youtube.com"+video_url
+
         ##  썸네일, 
         
         if 'watch?v=' in video_url:
             vid = video_url.split('watch?v=')[-1]
-            thumb_img = f'https://i.ytimg.com/vi/{vid}/hqdefault.jpg' #('img', {'id': 'img'})
+            thumb_img = f'https://i.ytimg.com/vi/{vid}/hqdefault.jpg' 
         else:
             vid = video_url.split('/')[-1]
-            thumb_img = f'https://i.ytimg.com/vi/{vid}/hq2.jpg' #('img', {'id': 'img'})
-
+            thumb_img = f'https://i.ytimg.com/vi/{vid}/hq2.jpg' 
 
         ##  제목
-        title = source.find_element_by_css_selector('#video-title').text    #find('a', {'id': 'video-title'}).text 
-        title = title.replace('\n', '') # 줄 바뀜 없애기 
-        title = title.replace('\t', '') # 탭 줄이기 
-        title = title.strip() 
-        #  조회수, 
-        view_num = source.find_element_by_css_selector('#metadata-line').text                  #find('div', {'id': 'metadata-line'}).text
-        view_num = view_num.split("\n")[0].replace("조회수","")
+        title = video_list[j].find('a', {'id': 'video-title'}).text 
 
-        # #  댓글 수
-        # thumb_img = video_list[j].find('img', {'id': 'img'})['src']
+        #  조회수, 
+        view_num = video_list[j].find('div', {'id': 'metadata-line'}).findAll('span')[0].text 
+        view_num = view_num.split("\n")[0].replace("조회수 ","")
+
 
         # print({'video_url': video_url, 'thumb_img': thumb_img, 'title': title, 'view_num': view_num} )
         tasklist.append({'video_url': video_url, 'thumb_img': thumb_img, 'title': title, 'view_num': view_num} ) 
 
-
+    ###return 하지 않아도 tasklist 에 값이 저장되어있음
     return None
 
 
@@ -129,8 +128,10 @@ def main(channel_url):
     driver = initial()
     channel_collector(tasklist, channel_url, driver)
     for task in tasklist:
-        url = task['video_url']
-        comment_scrap(url, driver)
+        print(task)
+        # url = task['video_url']
+        # comment_scrap(url, driver)
+    
 
 if __name__=="__main__":
     channel_url = input()
