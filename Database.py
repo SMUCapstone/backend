@@ -144,38 +144,38 @@ def search(key):
     else:
         return 0, 0
 
+if __name__=="__main__":
+    # ###### 실행예시 ++++++++++++++++++++++++++++++
+    # 유튜브 테이블 모든 정보 출력
+    sql = "select * from youtuber"
+    curs.execute(sql)
+    result = curs.fetchall()
+    data = pd.DataFrame(result)
+    data
 
-# ###### 실행예시 ++++++++++++++++++++++++++++++
-# 유튜브 테이블 모든 정보 출력
-sql = "select * from youtuber"
-curs.execute(sql)
-result = curs.fetchall()
-data = pd.DataFrame(result)
-data
-
-# 콘텐츠 테이블 모든 정보 출력
-sql = "select * from content"
-curs.execute(sql)
-result = curs.fetchall()
-data = pd.DataFrame(result)
-print(data)
-
-
-# 아카이브 테이블 모든 정보 출력
-sql = "select * from archive"
-curs.execute(sql)
-result = curs.fetchall()
-data = pd.DataFrame(result)
-data
+    # 콘텐츠 테이블 모든 정보 출력
+    sql = "select * from content"
+    curs.execute(sql)
+    result = curs.fetchall()
+    data = pd.DataFrame(result)
+    print(data)
 
 
-# search 실행예시
-data, num = search('백현')
-print('총 검색결과: '+ str(num) +'건\n')
-print(data)
+    # 아카이브 테이블 모든 정보 출력
+    sql = "select * from archive"
+    curs.execute(sql)
+    result = curs.fetchall()
+    data = pd.DataFrame(result)
+    data
 
-# get_archive_record 실행 예시
-record = get_archive_record('baekhyunGP0')
-print(record.recognize)
-print(record.max)
-print(record.pos[0:10])
+
+    # search 실행예시
+    data, num = search('백현')
+    print('총 검색결과: '+ str(num) +'건\n')
+    print(data)
+
+    # get_archive_record 실행 예시
+    record = get_archive_record('baekhyunGP0')
+    print(record.recognize)
+    print(record.max)
+    print(record.pos[0:10])

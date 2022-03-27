@@ -1,10 +1,28 @@
-from bs4 import BeautifulSoup 
+from bs4 import BeautifulSoup
+from numpy import integer 
 from selenium import webdriver 
 from selenium.webdriver.common.by import By 
 from webdriver_manager.chrome import ChromeDriverManager 
 import time 
 import re 
 import Database
+
+def toInteger(string):
+    mul = 0
+    if '천' in string:
+        string = string.replace('천회', '')
+        mul = 1000
+    elif '만' in string:
+        string = string.replace('만회', '')
+        mul = 10000
+    elif '억' in string:
+        string = string.replace('억회', '')
+        mul = 10**8
+    else:
+        string = string.replace('회', '')
+        mul = 1
+    
+    return float(string)*mul
 
 def comment_scrap(url, driver):
     # 크롤링 목표 : 해당 영상에 대한 댓글 id, 댓글 내용, 댓글의 좋아요 개수 추출
@@ -69,7 +87,12 @@ def channel_collector(tasklist, url, driver):
     container = driver.find_element(By.CSS_SELECTOR, "#channel-header-container")
     profile_img = container.find_element(By.CSS_SELECTOR, "#img").get_attribute("src")
     channel_name = container.find_element(By.CSS_SELECTOR, "#text").text
-    youtuber_ID = url.split('/c/')[-1].split('/')[0]
+    if '/c/' in url:
+        youtuber_ID = url.split('/c/')[-1].split('/')[0]
+    elif '/channel/' in url:
+        youtuber_ID = url.split('/channel/')[-1].split('/')[0]
+    else:
+        pass
     youtuber_info = Database.Youtuber(youtuber_ID, channel_name, profile_img)
     Database.insert_youtuber_info(youtuber_info)
     # 스크롤 내리기 
@@ -119,9 +142,10 @@ def channel_collector(tasklist, url, driver):
         #  조회수, 
         view_num = video_list[j].find('div', {'id': 'metadata-line'}).findAll('span')[0].text 
         view_num = view_num.split("\n")[0].replace("조회수 ","")
+        hits = toInteger(view_num)
 
         # print({'video_url': video_url, 'thumb_img': thumb_img, 'title': title, 'view_num': view_num} )
-        tasklist.append({'id':youtuber_ID, 'video_url': video_url, 'video_name': title, 'thumb_img': thumb_img, 'hits': view_num} ) 
+        tasklist.append({'id':youtuber_ID, 'video_url': video_url, 'video_name': title, 'thumbnail': thumb_img, 'hits': hits} ) 
 
     ###return 하지 않아도a tasklist 에 값이 저장되어있음
     return None
@@ -136,7 +160,7 @@ def main(channel_url):
         url = task['video_url']
         comment_num = comment_scrap(url, driver)
         task['comment_num'] = comment_num
-        content = Database.Content(task['id'], task['url'], task['video_name'], task['thunbnail'], task['hits'], task['comment_num'])
+        content = Database.Content(task['id'], task['video_url'], task['video_name'], task['thumbnail'], task['hits'], task['comment_num'])
         Database.insert_content(content)
 
 if __name__=="__main__":
