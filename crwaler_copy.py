@@ -159,7 +159,7 @@ def main(channel_url):
         print(task)
         url = task['video_url']
         comment_num = comment_scrap(url, driver)
-        task['comment_num'] = comment_num
+        task['comment_num'] = int(comment_num.replace(',',''))
         content = Database.Content(task['id'], task['video_url'], task['video_name'], task['thumbnail'], task['hits'], task['comment_num'])
         Database.insert_content(content)
 
