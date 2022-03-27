@@ -129,8 +129,8 @@ def main(channel_url):
     channel_collector(tasklist, channel_url, driver)
     for task in tasklist:
         print(task)
-        # url = task['video_url']
-        # comment_scrap(url, driver)
+        url = task['video_url']
+        comment_scrap(url, driver)
     
 
 if __name__=="__main__":

@@ -145,7 +145,7 @@ def search(key):
         return 0, 0
 
 
-###### 실행예시 ++++++++++++++++++++++++++++++
+# ###### 실행예시 ++++++++++++++++++++++++++++++
 # 유튜브 테이블 모든 정보 출력
 sql = "select * from youtuber"
 curs.execute(sql)
@@ -158,7 +158,7 @@ sql = "select * from content"
 curs.execute(sql)
 result = curs.fetchall()
 data = pd.DataFrame(result)
-data
+print(data)
 
 
 # 아카이브 테이블 모든 정보 출력
