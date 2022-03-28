@@ -1,0 +1,138 @@
+########## 유튜버 테이블+++++++++++++++++++++++++++=============================
+#테스트 메소드
+def testYoutuber():
+    conn = get_connection()
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    sql = "select * from youtuber"
+    curs.execute(sql)
+    result = curs.fetchall()
+    data = pd.DataFrame(result)
+    return data
+
+
+
+# ***** 입력값 예시 *******
+# 유튜버 객체 생성 후 insert_youtuber_info(u) 실행
+# 테스트 할 때 아래의 u 객체 id('jimin')에 다른 값 입력해서 수행 (중복값 입력시 sql 오류)
+u = Youtuber('jimin', 'serendipity', 'http:sdfghjklsdfgh')
+insert_youtuber_info(u)
+
+data = testYoutuber()
+print(data)
+
+
+
+########## 콘텐츠 테이블 +++++++++++++++++++++++++++================================
+#테스트 메소드
+def testContent():
+    conn = get_connection()
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    sql = "select * from content"
+    curs.execute(sql)
+    result = curs.fetchall()
+    data = pd.DataFrame(result)
+    return data
+
+
+
+# ***** 입력값 예시 *****
+# 콘텐츠 객체 생성 후 insert_content(c) 실행
+# 테스트 값 입력 시 id 값이 유튜버 테이블에 존재하는 값만 입력가능함 (id값 확인 - testYoutuber() 호출)
+# url값(2열)을 수정해서 테스트 수행 (중복값 입력시 sql 오류발생)
+c = Content('sehun','http:asdfghjkl','세훈이의 브이로그2', 'http:asdfghjklerty',1000,1000)
+insert_content(c)
+
+data = testContent()
+print(data)
+
+
+
+
+####### 아카이브 테이블 ++++++++++++++++++++++++++++++++====================================
+#테스트 메소드
+def testArchive():
+    conn = get_connection()
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    sql = "select * from archive"
+    curs.execute(sql)
+    result = curs.fetchall()
+    data = pd.DataFrame(result)
+    return data
+
+
+# ***** 입력값 예시 ******
+# 아카이브 객체 생성 후 insert_archive(a) 실행
+# 테스트 값 입력 시 콘텐츠 테이블 recognize열에 있는 값을 입력해야함. (recognize값 확인 -> testContent() 호출)
+# 아카이브 정보는 영상 1개 당 1개 저장되기때문에 recognize 값이 중복될 경우 오류발생
+# 'sehun...' 부분을 교체하여 테스트 수행하기!
+a = Archive('sehunjkl', '세훈', 'p1','p2','p3','p4','p5','p6','p7','p8','p9','p10', 
+               'n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8', 'n9', 'n10')
+insert_archive(a)
+
+data = testArchive()
+print(data)
+
+
+
+# ****** get_archive_record(recognize) 메소드 테스트 *******
+# 'sehun...' 부분 교체하여 확인, 교체한 값은 recognize에 있는 값만 유효함
+data = get_archive_record('sehunjkl')
+print(data.recognize, data.max, data.pos, data.neg)
+
+
+
+
+########## 별칭 테이블 ++++++++++++++++++++++++++++++++++========================
+# 별칭테이블 생성 확인메소드
+def testCreateTable():
+    conn = get_connection()
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    sql = "show tables"
+    curs.execute(sql)
+    result = curs.fetchall()
+    data = pd.DataFrame(result)
+    return data
+
+
+# ***** 입력값 예시 *****
+# 'sehunjkl' 부분을 교체하여 테스트 수행, recognize 열에 있는 데이터로 수행 (recognize값 확인 -> testContent() 호출)
+# 프로그램 운영 시 c.recognize를 인수값으로 받게됨
+create_raw_comment_table('sehunjkl')
+
+data = testCreateTable()
+print(data)
+
+
+
+
+# 테스트 메소드 (별칭 테이블의 모든 데이터 출력)
+def testRcommentTable(recognize):
+    conn = get_connection()
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    sql = "select * from " + recognize + ""
+    curs.execute(sql)
+    result = curs.fetchall()
+    data = pd.DataFrame(result)
+    return data
+
+
+# insert_raw_comment(r), update_response(recognize, r) 동작 확인
+# ***** 입력값 예시 *****
+# 'baekhyunGP0' 값 교체하여 테스트 수행
+# 별칭 테이블이 이미 생성되어있어야 함, recognize 열에 있는 데이터로 수행 (recognize값 확인 -> testContent() 호출)
+# 프로그램 운영 시 c.recognize를 인수값으로 받게됨
+testRcommentTable('baekhyunGP0')
+
+
+
+
+
+
+####### 운영 search(검색어) +++++++++++++++++++++============================================================
+
+# ***** 입력값 예시 *****
+# '백현' 부분 교체하여 동작 확인
+# 유튜버 (1) id / (2) 채널명 / (3) url / (4) 영상 제목 기반으로 검색 가능, 부분일치 검색가능
+data, num = search('백현')
+print('총 검색결과: '+ str(num) +'건\n')
+print(data)
