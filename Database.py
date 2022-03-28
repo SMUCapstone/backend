@@ -1,14 +1,24 @@
-###### DB연동++++++++++++++++++++++++++++++++
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Mar 29 00:57:46 2022
+
+@author: USER
+"""
+
+###### DB연동++++++++++++++++++++++++++++++++=====================================================
 import pymysql
 import pandas as pd
 
 #db connection (aws mysql 서버)
-conn = pymysql.connect(host = 'capstone.cyh0mfc8nj8f.ap-northeast-2.rds.amazonaws.com', user = 'admin', password = 'capstone22', 
+def get_connection():
+    conn = pymysql.connect(host = 'capstone.cyh0mfc8nj8f.ap-northeast-2.rds.amazonaws.com', user = 'admin', password = 'capstone22', 
                        db="capstone", charset = 'utf8')
-curs = conn.cursor(pymysql.cursors.DictCursor)
+    return conn
 
 
-########## 유튜버 테이블+++++++++++++++++++++++++
+
+
+########## 유튜버 테이블+++++++++++++++++++++++++====================================================
 #유튜버 정보 입력 메소드
 #유튜버 객체
 class Youtuber():
@@ -21,11 +31,23 @@ class Youtuber():
 def insert_youtuber_info(u):
     '유튜버 정보 객체 받아서 sql 작성 후 정보 입력'
     sql = """insert into youtuber(id, channel, profile) values(%s, %s, %s)"""
-    curs.execute(sql,(u.id, u.channel, u.profile))
-    conn.commit()
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
+        
+        curs.execute(sql,(u.id, u.channel, u.profile))
+        conn.commit()
+        
+    except Exception as errmsg:
+        print(errmsg)
+    
+    finally:
+        conn.commit()
+        curs.close()
 
 
-########## 콘텐츠 테이블 +++++++++++++++++++++++++++
+
+########## 콘텐츠 테이블 +++++++++++++++++++++++++++===============================================
 #콘텐츠 정보 입력 메소드
 #콘텐츠 객체
 class Content():
@@ -51,12 +73,24 @@ class Content():
 def insert_content(c):
     '콘텐츠 정보 객체 받아서 sql 작성 후 정보 입력'
     sql = """insert into content(id, url, recognize, video_name,thumbnail, hits, comment_num) values(%s, %s, %s, %s, %s, %s, %s)"""
-    curs.execute(sql,(c.id, c.url, c.recognize, c.video_name, c.thumbnail, c.hits, c.comment_num ))
-    conn.commit()
+    
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
+        
+        curs.execute(sql,(c.id, c.url, c.recognize, c.video_name, c.thumbnail, c.hits, c.comment_num ))
+        conn.commit()
+    
+    except Exception as errmsg:
+        print(errmsg)
+    
+    finally:
+        conn.commit()
+        curs.close()
 
 
 
-####### 아카이브 테이블 ++++++++++++++++++++++++++++++++
+####### 아카이브 테이블 ++++++++++++++++++++++++++++++++=============================================
 #아카이브 자료 입력 메소드
 #아카이브 객체
 class Archive():
@@ -79,52 +113,141 @@ def insert_archive(a):
             neg1, neg2, neg3, neg4, neg5, neg6, neg7, neg8, neg9, neg10) 
             values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
     
-    curs.execute(sql,(a.recognize, a.max, a.pos[0],a.pos[1],a.pos[2],a.pos[3],a.pos[4],a.pos[5],a.pos[6],a.pos[7],a.pos[8],a.pos[9], 
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
+        curs.execute(sql,(a.recognize, a.max, a.pos[0],a.pos[1],a.pos[2],a.pos[3],a.pos[4],a.pos[5],a.pos[6],a.pos[7],a.pos[8],a.pos[9], 
                       a.neg[0], a.neg[1], a.neg[2], a.neg[3], a.neg[4], a.neg[5], a.neg[6], a.neg[7], a.neg[8], a.neg[9]))
-    conn.commit()
-
+        conn.commit()
+        
+    except Exception as errmsg:
+        print(errmsg)
+    
+    finally:
+        conn.commit()
+        curs.close()
 
 
 # get_archive_record 메소드
 def get_archive_record(recognize):
     '아카이브 테이블에서 정보 가져오기'
     sql = "select * from archive where recognize = '" + recognize + "'"
-    curs.execute(sql)
-    data = curs.fetchall()
     
-    # 데이터 프레임 생성
-    df = pd.DataFrame(data)
-    #print(df.head())
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
+        
+        curs.execute(sql)
+        data = curs.fetchall()
     
-    # 아카이브 객체 생성 후 정보 입력
-    record = Archive(df.loc[0,'recognize'], df.loc[0,'max'], 
+        # 데이터 프레임 생성
+        df = pd.DataFrame(data)
+        #print(df.head())
+    
+        # 아카이브 객체 생성 후 정보 입력
+        record = Archive(df.loc[0,'recognize'], df.loc[0,'max'], 
                      df.loc[0,'pos1'], df.loc[0,'pos2'], df.loc[0,'pos3'], df.loc[0,'pos4'], df.loc[0,'pos5'], 
                      df.loc[0,'pos6'], df.loc[0,'pos7'], df.loc[0,'pos8'], df.loc[0,'pos9'], df.loc[0,'pos10'],
                      df.loc[0,'neg1'], df.loc[0,'neg2'], df.loc[0,'neg3'], df.loc[0,'neg4'], df.loc[0,'neg5'],
                      df.loc[0,'neg6'], df.loc[0,'neg7'], df.loc[0,'neg8'], df.loc[0,'neg9'], df.loc[0,'neg10'])
     
-    # record 반환
-    return record
+        # record 반환
+        return record
+    
+    except Exception as errmsg:
+        print(errmsg)
+        
+    finally:
+        conn.commit()
+        curs.close()
 
 
 
-
-########## 별칭 테이블 ++++++++++++++++++++++++++++++++++
+########## 별칭 테이블 ++++++++++++++++++++++++++++++++++============================================
 # create_raw_comment_table 메소드
 def create_raw_comment_table(recognize):
     'content테이블에서 별칭 이름 받아서 해당 영상의 raw comment 테이블 생성'
     
-    sql = "create table "+ recognize + "(comment varchar(10000), like_num varchar(5), response int);"
-    curs.execute(sql)
-    conn.commit()
+    sql = "create table "+ recognize + "(comment varchar(10000), like_num int, response int);"
+    
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
+        
+        curs.execute(sql)
+        conn.commit()
+    
+    except Exception as errmsg:
+        print(errmsg)
+        
+    finally:
+        conn.commit()
+        curs.close()
 
 
-#별칭 테이블 response열 업데이트 ????????????????(구현 미룸... where claue 모호성)????????????????????????
+# raw 코멘트 객체
+# response 속성 초기값 none
+class Rcomment():
+    def __init__ (self, comment, like_num):
+        self.comment = comment
+        self.like_num = like_num
+        
+    @property
+    def response(self):
+        return 0
+
+
+# insert_raw_comment 메소드
+def insert_raw_comment(recognize, r):
+    '별칭(테이블명), r코멘트 객체 입력 받아서 sql 작성 후 정보 입력'
+    
+    # response 열 초기값: null 추후 update_response()로 정보 update
+    sql = "insert into " + recognize + "(comment, like_num, response) values(%s, %s, %s)"
+    
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
+        
+        curs.execute(sql,(r.comment, r.like_num, r.response))
+        conn.commit()
+    
+    except Exception as errmsg:
+        print(errmsg)
+        
+    finally:
+        conn.commit()
+        curs.close()
+
+
+# 별칭 테이블 response열 업데이트 메소드
+# response 열 기본값은 0, 긍정적 반응일때만 update_response 호출하여 1로 업데이트
+# recognize(테이블 이름), r객체 입력받음
+def update_response(recognize, r):
+    '긍정반응일때만 response열 1로 업데이트, comment = r.comment 완전일치로 찾아들어감'
+    sql = "update " + recognize + " set response = 1 where comment = '" + r.comment +"'"
+    
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
+        
+        # 키 없이 업데이트 수행할 때 발생하는 오류 방지하기 위해 safe모드 해제
+        safe_unlock = "set sql_safe_updates=0"
+        curs.execute(safe_unlock)
+        
+        curs.execute(sql)
+        conn.commit()
+    
+    except Exception as errmsg:
+        print(errmsg)
+        
+    finally:
+        conn.commit()
+        curs.close()
 
 
 
 
-####### 운영 search(검색어) +++++++++++++++++++++
+####### 운영 search(검색어) +++++++++++++++++++++============================================================
 #search메소드
 def search(key):
     '유튜버&콘텐츠 테이블 조인해서 검색하기'
@@ -133,49 +256,24 @@ def search(key):
     #select * from youtuber y left join content c on y.id=c.id union select * from youtuber y right join content c on y.id=c.id;
     sql = "select * from youtuber natural join content where youtuber.id like '%" + key + "%' or " +"url like '%" + key + "%' or " + "video_name like '%" + key + "%' or " + "channel like '%" + key +"%'"
     
-    #sql 실행하여 몇행 반환하는지 num에 저장, result에 결과값 저장
-    num = curs.execute(sql)
-    result = curs.fetchall()
-   
-    #결과값 있으면 데이터 프레임과 행수 return, 없으면 0 return
-    if(result):
-        result = pd.DataFrame(result)
-        return result, num
-    else:
-        return 0, 0
-
-if __name__=="__main__":
-    # ###### 실행예시 ++++++++++++++++++++++++++++++
-    # 유튜브 테이블 모든 정보 출력
-    sql = "select * from youtuber"
-    curs.execute(sql)
-    result = curs.fetchall()
-    data = pd.DataFrame(result)
-    data
-
-    # 콘텐츠 테이블 모든 정보 출력
-    sql = "select * from content"
-    curs.execute(sql)
-    result = curs.fetchall()
-    data = pd.DataFrame(result)
-    print(data)
-
-
-    # 아카이브 테이블 모든 정보 출력
-    sql = "select * from archive"
-    curs.execute(sql)
-    result = curs.fetchall()
-    data = pd.DataFrame(result)
-    data
-
-
-    # search 실행예시
-    data, num = search('백현')
-    print('총 검색결과: '+ str(num) +'건\n')
-    print(data)
-
-    # get_archive_record 실행 예시
-    record = get_archive_record('baekhyunGP0')
-    print(record.recognize)
-    print(record.max)
-    print(record.pos[0:10])
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
+        
+        #sql 실행하여 몇행 반환하는지 num에 저장, result에 결과값 저장
+        num = curs.execute(sql)
+        result = curs.fetchall()
+        
+        #결과값 있으면 데이터 프레임과 행 수 return, 없으면 0 return
+        if(result):
+            result = pd.DataFrame(result)
+            return result, num
+        else:
+            return 0, 0
+    
+    except Exception as errmsg:
+        print(errmsg)
+        
+    finally:
+        conn.commit()
+        curs.close()
