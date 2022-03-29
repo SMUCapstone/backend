@@ -116,11 +116,20 @@ def testRcommentTable(recognize):
     return data
 
 
-# insert_raw_comment(r), update_response(recognize, r) 동작 확인
-# ***** 입력값 예시 *****
-# 'baekhyunGP0' 값 교체하여 테스트 수행
+# insert_raw_comment(r) 동작 확인
+# r코멘트 객체 생성해서 파라미터로 넘김
 # 별칭 테이블이 이미 생성되어있어야 함, recognize 열에 있는 데이터로 수행 (recognize값 확인 -> testContent() 호출)
-# 프로그램 운영 시 c.recognize를 인수값으로 받게됨
+# **** 입력값 예시 ***
+r = Rcomment('Literally I can watch baekhyun’s vlogs everyday without being bored', 100)
+insert_raw_comment('baekhyunGP0', r)
+testRcommentTable('baekhyunGP0')
+
+
+# update_response(recognize, r) 동작 확인
+# 테이블 이름(recognize)와 r코멘트 객체를 파라미터로 넘김
+# update_response 호출 시 해당 comment의 response 값이 0으로 바뀜
+# **** 입력값 예시 ***
+update_response('baekhyunGP0', r)
 testRcommentTable('baekhyunGP0')
 
 
