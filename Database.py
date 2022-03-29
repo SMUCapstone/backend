@@ -194,7 +194,7 @@ class Rcomment():
         
     @property
     def response(self):
-        return 0
+        return 1
 
 
 # insert_raw_comment 메소드
@@ -220,11 +220,12 @@ def insert_raw_comment(recognize, r):
 
 
 # 별칭 테이블 response열 업데이트 메소드
-# response 열 기본값은 0, 긍정적 반응일때만 update_response 호출하여 1로 업데이트
+# response 열 기본값은 1, 부정적 반응일때만 update_response 호출하여 0로 업데이트
+# 긍정반응보다 부정반응이 더 적을 것이라고 예상됨, 오버헤드 최소화
 # recognize(테이블 이름), r객체 입력받음
 def update_response(recognize, r):
     '긍정반응일때만 response열 1로 업데이트, comment = r.comment 완전일치로 찾아들어감'
-    sql = "update " + recognize + " set response = 1 where comment = '" + r.comment +"'"
+    sql = "update " + recognize + " set response = 0 where comment = '" + r.comment +"'"
     
     try:
         conn = get_connection()
