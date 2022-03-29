@@ -186,7 +186,7 @@ def create_raw_comment_table(recognize):
 
 
 # raw 코멘트 객체
-# response 속성 초기값 none
+# response 속성 초기값 1
 class Rcomment():
     def __init__ (self, comment, like_num):
         self.comment = comment
@@ -224,7 +224,7 @@ def insert_raw_comment(recognize, r):
 # 긍정반응보다 부정반응이 더 적을 것이라고 예상됨, 오버헤드 최소화
 # recognize(테이블 이름), r객체 입력받음
 def update_response(recognize, r):
-    '긍정반응일때만 response열 1로 업데이트, comment = r.comment 완전일치로 찾아들어감'
+    '부정반응일때만 response열 0로 업데이트, comment = r.comment 완전일치로 찾아들어감'
     sql = "update " + recognize + " set response = 0 where comment = '" + r.comment +"'"
     
     try:
