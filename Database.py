@@ -88,6 +88,30 @@ def insert_content(c):
         conn.commit()
         curs.close()
 
+        
+        
+
+# show_another_3_video 메소드
+def show_another_3_video(c):
+    '분석화면에서 <채널명의 다른 콘텐츠>칸에 띄울 3개 영상 가져오는 메소드'
+    
+    # 현재 분석화면의 영상 제외하고 조회수 가장 많은 3가지 영상 가져옴
+    sql = "select * from content where id = '" + c.id + "' and recognize <> '" + c.recognize +"' order by hits desc limit 3"
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
+        
+        curs.execute(sql)
+        result = curs.fetchall()
+        data = pd.DataFrame(result)
+        return data
+    
+    except Exception as errmsg:
+        print(errmsg)
+        
+    finally:
+        curs.close()        
+        
 
 
 ####### 아카이브 테이블 ++++++++++++++++++++++++++++++++=============================================
