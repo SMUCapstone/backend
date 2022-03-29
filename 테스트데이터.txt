@@ -47,6 +47,15 @@ print(data)
 
 
 
+# ***** show_another_3_video(c) 메소드 테스트 ******
+# 'KBSKpop' (id), 'https://www.youtube.com/watch?v=1-e_NXZbjcw' (영상url)만 정확하게 입력하면 테스트 수행가능
+c = Content('KBSKpop','https://www.youtube.com/watch?v=1-e_NXZbjcw','시작부터 오열각..ㅠ', 'https://i.ytimg.com/=', 8125225, 1782)
+data = show_another_3_video(c)
+print(data)
+
+
+
+
 
 ####### 아카이브 테이블 ++++++++++++++++++++++++++++++++====================================
 #테스트 메소드
