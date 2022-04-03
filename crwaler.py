@@ -1,11 +1,14 @@
 from bs4 import BeautifulSoup
-from numpy import integer 
 from selenium import webdriver 
 from selenium.webdriver.common.by import By 
 from webdriver_manager.chrome import ChromeDriverManager 
 import time 
 import re 
 import Database
+import urllib
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 
 def toInteger(string):
     mul = 0
@@ -24,12 +27,45 @@ def toInteger(string):
     
     return float(string)*mul
 
+def url_validation(url):
+    x = url.split("/")
+    i = 0
+    print(x)
+    try:
+        # 프로토콜이 적혀있는가? 
+        if x[i] != 'https:':
+            url = 'https://' + url
+            i+=1
+        else:
+            i+=2
+        # 유튜브 url이 맞는가?
+        if x[i] == 'www.youtube.com':
+            i+=1
+        else:
+            return -1
+        # 유튜브 채널 페이지가 맞는가?
+        if x[i]=='c' or x[i]=='channel':
+            c = x[i]
+            chn = x[i+1]
+            i+=2
+        else:
+            return -1
+    except:
+        return -1
+    # 채널 비디오 페이지가 맞는가?
+
+    url = f'https://www.youtube.com/{c}/{chn}/videos' 
+    return url
+
+
+        
 def comment_scrap(url, driver):
     # 크롤링 목표 : 해당 영상에 대한 댓글 id, 댓글 내용, 댓글의 좋아요 개수 추출
     data_list = [] 
     driver.get(url) 
     # 스크롤 내리기 
-    comment_num = driver.find_element(By.CSS_SELECTOR, '#title #count span:nth-child(2)').text
+    comment_num = WebDriverWait(driver, 10).until(lambda x: x.find_element(By.CSS_SELECTOR, '#title #count span:nth-child(2)')).text
+    print(comment_num)
     last_page_height = driver.execute_script("return document.documentElement.scrollHeight") 
     while True: 
         driver.execute_script("window.scrollTo(0, document.documentElement.scrollHeight);") 
@@ -156,6 +192,7 @@ def channel_collector(tasklist, url, driver):
 
 
 def main(channel_url):
+    channel_url= urllib.parse.unquote(channel_url)
     tasklist = []
     driver = initial()
     channel_collector(tasklist, channel_url, driver)
