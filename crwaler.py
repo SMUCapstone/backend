@@ -1,15 +1,36 @@
-from bs4 import BeautifulSoup 
+from bs4 import BeautifulSoup
+from numpy import integer 
 from selenium import webdriver 
 from selenium.webdriver.common.by import By 
 from webdriver_manager.chrome import ChromeDriverManager 
 import time 
 import re 
+import Database
+from pymysql.err import IntegrityError
+
+def toInteger(string):
+    mul = 0
+    string = string.replace('회', '')
+    if '천' in string:
+        string = string.replace('천', '')
+        mul = 1000
+    elif '만' in string:
+        string = string.replace('만', '')
+        mul = 10000
+    elif '억' in string:
+        string = string.replace('억', '')
+        mul = 10**8
+    else:
+        mul = 1
+    
+    return float(string)*mul
 
 def comment_scrap(url, driver):
     # 크롤링 목표 : 해당 영상에 대한 댓글 id, 댓글 내용, 댓글의 좋아요 개수 추출
     data_list = [] 
     driver.get(url) 
     # 스크롤 내리기 
+    comment_num = driver.find_element(By.CSS_SELECTOR, '#title #count span:nth-child(2)').text
     last_page_height = driver.execute_script("return document.documentElement.scrollHeight") 
     while True: 
         driver.execute_script("window.scrollTo(0, document.documentElement.scrollHeight);") 
@@ -36,15 +57,16 @@ def comment_scrap(url, driver):
         ## 댓글 좋아요 개수 (0인 경우 예외 처리) 
         try: 
             like_num = comments_list[j].find('span', {'id': 'vote-count-middle', 'class': 'style-scope ytd-comment-action-buttons-renderer', 'aria-label': re.compile('좋아요')}).text 
-            like_num = like_num.replace('\n', '') # 줄 바뀜 없애기 
-            like_num = like_num.replace('\t', '') # 탭 줄이기 
+            like_num = toInteger(like_num)
             like_num = like_num.strip() 
         except: 
             like_num = 0 
-        data = {'comment': comment, 'youtube_id': youtube_id, 'like_num': like_num} 
+        data = {'comment': comment, 'like_num': like_num, 'youtube_id': youtube_id} 
         data_list.append(data) 
+
     #### 혜원님이 DB 만들어주시면 DB에 올리는 함수 호출
-    return data_list
+    
+    return [comment_num, data_list]
 
 def initial():
     # 셀레니움 옵션 설정 
@@ -65,8 +87,19 @@ def channel_collector(tasklist, url, driver):
     container = driver.find_element(By.CSS_SELECTOR, "#channel-header-container")
     profile_img = container.find_element(By.CSS_SELECTOR, "#img").get_attribute("src")
     channel_name = container.find_element(By.CSS_SELECTOR, "#text").text
-    youtuber_ID = url.split('/')[4]
-    print(profile_img, channel_name, youtuber_ID)
+    if '/c/' in url:
+        youtuber_ID = url.split('/c/')[-1].split('/')[0]
+    elif '/channel/' in url:
+        youtuber_ID = url.split('/channel/')[-1].split('/')[0]
+    else:
+        pass
+    ## 유튜버 테이블이 없으면 만들고 있으면 넘어가기
+    try:
+        youtuber_info = Database.Youtuber(youtuber_ID, channel_name, profile_img)
+        Database.insert_youtuber_info(youtuber_info)
+    except IntegrityError:
+        pass
+
     # 스크롤 내리기 
     last_page_height = driver.execute_script("return document.documentElement.scrollHeight") 
     elements = []
@@ -114,10 +147,10 @@ def channel_collector(tasklist, url, driver):
         #  조회수, 
         view_num = video_list[j].find('div', {'id': 'metadata-line'}).findAll('span')[0].text 
         view_num = view_num.split("\n")[0].replace("조회수 ","")
-
+        hits = toInteger(view_num)
 
         # print({'video_url': video_url, 'thumb_img': thumb_img, 'title': title, 'view_num': view_num} )
-        tasklist.append({'video_url': video_url, 'thumb_img': thumb_img, 'title': title, 'view_num': view_num} ) 
+        tasklist.append({'id':youtuber_ID, 'video_url': video_url, 'video_name': title, 'thumbnail': thumb_img, 'hits': hits} ) 
 
     ###return 하지 않아도a tasklist 에 값이 저장되어있음
     return None
@@ -130,8 +163,21 @@ def main(channel_url):
     for task in tasklist:
         print(task)
         url = task['video_url']
-        comment_scrap(url, driver)
-    
+        comment_scrapped = comment_scrap(url, driver)
+        comment_num = comment_scrapped[0]
+        datalist = comment_scrapped[1]
+        task['comment_num'] = int(comment_num.replace(',',''))
+        content = Database.Content(task['id'], task['video_url'], task['video_name'], task['thumbnail'], task['hits'], task['comment_num'])
+        Database.insert_content(content)
+        # recognize Content객채의 recognize 값을 받아온 다음 recognize테이블 생성
+        recognize = content.recognize
+        Database.create_raw_comment_table(recognize)
+        # Rawcomment 객체 생성해서 DB에 저장.
+        # data = {'comment': comment, 'like_num': like_num, 'youtube_id': youtube_id}
+        for data in datalist:
+            r = Database.Rcomment(data['comment'], data['like_num'])
+            Database.insert_raw_comment(recognize, r)
+
 
 if __name__=="__main__":
     channel_url = input()
