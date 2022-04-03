@@ -8,6 +8,7 @@ Created on Tue Mar 29 00:57:46 2022
 ###### DB연동++++++++++++++++++++++++++++++++=====================================================
 import pymysql
 import pandas as pd
+from pymysql.err import IntegrityError
 
 #db connection (aws mysql 서버)
 def get_connection():
@@ -37,9 +38,12 @@ def insert_youtuber_info(u):
         
         curs.execute(sql,(u.id, u.channel, u.profile))
         conn.commit()
-        
+    except IntegrityError:
+        pass
+
     except Exception as errmsg:
         print(errmsg)
+        return 
     
     finally:
         conn.commit()
