@@ -9,17 +9,17 @@ import Database
 
 def toInteger(string):
     mul = 0
+    string = string.replace('회', '')
     if '천' in string:
-        string = string.replace('천회', '')
+        string = string.replace('천', '')
         mul = 1000
     elif '만' in string:
-        string = string.replace('만회', '')
+        string = string.replace('만', '')
         mul = 10000
     elif '억' in string:
-        string = string.replace('억회', '')
+        string = string.replace('억', '')
         mul = 10**8
     else:
-        string = string.replace('회', '')
         mul = 1
     
     return float(string)*mul
@@ -56,8 +56,7 @@ def comment_scrap(url, driver):
         ## 댓글 좋아요 개수 (0인 경우 예외 처리) 
         try: 
             like_num = comments_list[j].find('span', {'id': 'vote-count-middle', 'class': 'style-scope ytd-comment-action-buttons-renderer', 'aria-label': re.compile('좋아요')}).text 
-            like_num = like_num.replace('\n', '') # 줄 바뀜 없애기 
-            like_num = like_num.replace('\t', '') # 탭 줄이기 
+            like_num = toInteger(like_num)
             like_num = like_num.strip() 
         except: 
             like_num = 0 
@@ -66,7 +65,7 @@ def comment_scrap(url, driver):
 
     #### 혜원님이 DB 만들어주시면 DB에 올리는 함수 호출
     
-    return comment_num
+    return [comment_num, data_list]
 
 def initial():
     # 셀레니움 옵션 설정 
@@ -158,10 +157,21 @@ def main(channel_url):
     for task in tasklist:
         print(task)
         url = task['video_url']
-        comment_num = comment_scrap(url, driver)
+        comment_scrapped = comment_scrap(url, driver)
+        comment_num = comment_scrapped[0]
+        datalist = comment_scrapped[1]
         task['comment_num'] = int(comment_num.replace(',',''))
         content = Database.Content(task['id'], task['video_url'], task['video_name'], task['thumbnail'], task['hits'], task['comment_num'])
         Database.insert_content(content)
+        # recognize Content객채의 recognize 값을 받아온 다음 recognize테이블 생성
+        recognize = content.recognize
+        Database.create_raw_comment_table(recognize)
+        # Rawcomment 객체 생성해서 DB에 저장.
+        # data = {'comment': comment, 'like_num': like_num, 'youtube_id': youtube_id}
+        for data in datalist:
+            r = Database.Rcomment(data['comment'], data['like_num'])
+            Database.insert_raw_comment(recognize, r)
+
 
 if __name__=="__main__":
     channel_url = input()
