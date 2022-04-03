@@ -6,6 +6,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 import time 
 import re 
 import Database
+from pymysql.err import IntegrityError
 
 def toInteger(string):
     mul = 0
@@ -29,7 +30,7 @@ def comment_scrap(url, driver):
     data_list = [] 
     driver.get(url) 
     # 스크롤 내리기 
-    comment_num = driver.find_element(By.CSS_SELECTOR, '#title #count span:nth-child(2)')
+    comment_num = driver.find_element(By.CSS_SELECTOR, '#title #count span:nth-child(2)').text
     last_page_height = driver.execute_script("return document.documentElement.scrollHeight") 
     while True: 
         driver.execute_script("window.scrollTo(0, document.documentElement.scrollHeight);") 
@@ -92,8 +93,13 @@ def channel_collector(tasklist, url, driver):
         youtuber_ID = url.split('/channel/')[-1].split('/')[0]
     else:
         pass
-    youtuber_info = Database.Youtuber(youtuber_ID, channel_name, profile_img)
-    Database.insert_youtuber_info(youtuber_info)
+    ## 유튜버 테이블이 없으면 만들고 있으면 넘어가기
+    try:
+        youtuber_info = Database.Youtuber(youtuber_ID, channel_name, profile_img)
+        Database.insert_youtuber_info(youtuber_info)
+    except IntegrityError:
+        pass
+
     # 스크롤 내리기 
     last_page_height = driver.execute_script("return document.documentElement.scrollHeight") 
     elements = []
