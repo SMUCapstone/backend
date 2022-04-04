@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Mar 29 00:57:46 2022
+Created on Mon Apr  4 22:39:47 2022
 
 @author: USER
 """
@@ -38,6 +38,7 @@ def insert_youtuber_info(u):
         
         curs.execute(sql,(u.id, u.channel, u.profile))
         conn.commit()
+
     except IntegrityError:
         pass
 
@@ -84,6 +85,9 @@ def insert_content(c):
         
         curs.execute(sql,(c.id, c.url, c.recognize, c.video_name, c.thumbnail, c.hits, c.comment_num ))
         conn.commit()
+
+    except IntegrityError:
+        pass
     
     except Exception as errmsg:
         print(errmsg)
@@ -147,10 +151,43 @@ def insert_archive(a):
         curs.execute(sql,(a.recognize, a.max, a.pos[0],a.pos[1],a.pos[2],a.pos[3],a.pos[4],a.pos[5],a.pos[6],a.pos[7],a.pos[8],a.pos[9], 
                       a.neg[0], a.neg[1], a.neg[2], a.neg[3], a.neg[4], a.neg[5], a.neg[6], a.neg[7], a.neg[8], a.neg[9]))
         conn.commit()
+
+    except IntegrityError:
+        pass
         
     except Exception as errmsg:
         print(errmsg)
     
+    finally:
+        conn.commit()
+        curs.close()
+
+
+
+# update_archive 메소드
+# 정기적으로 크롤러 돌았을때 변경할 값이 있으면 호출해서 아카이브 정보 업데이트
+# 해당 아카이브 삭제 후 재등록 하도록 구현
+def update_archive(a):
+    
+    delete_archive = "delete from archive where recognize = '" + a.recognize +"'"
+    
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
+        
+        # 기존 아카이브 레코드 삭제
+        curs.execute(delete_archive)
+        conn.commit()
+        
+        # insert_arhive 호출해서 아카이브 레코드 새로 생성
+        insert_archive(a)
+
+    except IntegrityError:
+        pass
+
+    except Exception as errmsg:
+        print(errmsg)
+        
     finally:
         conn.commit()
         curs.close()
@@ -196,7 +233,7 @@ def get_archive_record(recognize):
 def create_raw_comment_table(recognize):
     'content테이블에서 별칭 이름 받아서 해당 영상의 raw comment 테이블 생성'
     
-    sql = "create table "+ recognize + "(comment varchar(10000), like_num int, response int);"
+    sql = "create table "+ recognize + "(comment varchar(10000), like_num int, response int, unique key(comment));"
     
     try:
         conn = get_connection()
@@ -204,7 +241,10 @@ def create_raw_comment_table(recognize):
         
         curs.execute(sql)
         conn.commit()
-    
+
+    except IntegrityError:
+        pass
+
     except Exception as errmsg:
         print(errmsg)
         
@@ -232,13 +272,22 @@ def insert_raw_comment(recognize, r):
     # response 열 초기값: null 추후 update_response()로 정보 update
     sql = "insert into " + recognize + "(comment, like_num, response) values(%s, %s, %s)"
     
+    # insert전 unique 체크
+    check = "select * from " + recognize + " where comment = '" + r.comment + "'"
+    
     try:
         conn = get_connection()
         curs = conn.cursor(pymysql.cursors.DictCursor)
         
-        curs.execute(sql,(r.comment, r.like_num, r.response))
-        conn.commit()
-    
+        # unique 결과 값이 0(동일한 코멘트 없음)이면 R코멘트 insert
+        unique = curs.execute(check)
+        if(unique==0):
+            curs.execute(sql,(r.comment, r.like_num, r.response))
+            conn.commit()
+
+    except IntegrityError:
+        pass
+
     except Exception as errmsg:
         print(errmsg)
         
