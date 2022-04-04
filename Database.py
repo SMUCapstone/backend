@@ -233,7 +233,7 @@ def get_archive_record(recognize):
 def create_raw_comment_table(recognize):
     'content테이블에서 별칭 이름 받아서 해당 영상의 raw comment 테이블 생성'
     
-    sql = "create table "+ recognize + "(comment varchar(10000), like_num int, response int, unique key(comment));"
+    sql = "create table "+ recognize + "(comment varchar(10000), like_num int, response int);"
     
     try:
         conn = get_connection()
