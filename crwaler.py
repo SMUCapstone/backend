@@ -167,6 +167,7 @@ def main(channel_url):
     for task in tasklist:
         max_num +=1
         if max_num > 100:
+            print("끝")
             break
         url = task['video_url']
         print(url)
