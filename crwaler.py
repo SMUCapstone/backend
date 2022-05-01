@@ -163,7 +163,11 @@ def main(channel_url):
     youtube_api_key = 'AIzaSyCEwR4BXNL_ZxJgy6JTBcu2_wYuwS3RnDo'
     driver = initial()
     channel_collector(tasklist, channel_url, driver)
+    max_num = 0
     for task in tasklist:
+        max_num +=1
+        if max_num > 100:
+            break
         url = task['video_url']
         print(url)
         comment_num = get_comment_num(url, driver)
