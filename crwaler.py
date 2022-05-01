@@ -8,6 +8,7 @@ import Database
 import urllib
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from youtubeAPI import get_comment_and_likes
 
 
 def toInteger(string):
@@ -59,49 +60,14 @@ def url_validation(url):
 
 
         
-def comment_scrap(url, driver):
+def get_comment_num(url, driver):
     # 크롤링 목표 : 해당 영상에 대한 댓글 id, 댓글 내용, 댓글의 좋아요 개수 추출
-    data_list = [] 
     driver.get(url) 
     # 스크롤 내리기 
     comment_num = WebDriverWait(driver, 10).until(lambda x: x.find_element(By.CSS_SELECTOR, '#title #count span:nth-child(2)')).text
-    print(comment_num)
-    last_page_height = driver.execute_script("return document.documentElement.scrollHeight") 
-    while True: 
-        driver.execute_script("window.scrollTo(0, document.documentElement.scrollHeight);") 
-        time.sleep(2)
-        new_page_height = driver.execute_script("return document.documentElement.scrollHeight") 
-        if new_page_height == last_page_height: 
-            break
-        last_page_height = new_page_height
-    html0 = driver.page_source 
-    html = BeautifulSoup(html0, 'html.parser') 
-    comments_list = html.findAll('ytd-comment-thread-renderer', {'class': 'style-scope ytd-item-section-renderer'})
 
+    return comment_num
 
-    for j in range(len(comments_list)): 
-        ## 댓글 내용 
-        comment = comments_list[j].find('yt-formatted-string', {'id': 'content-text'}).text 
-        comment = comment.replace('\n', '')          
-        comment = comment.replace('\t', '')        
-        ## 유튜브 id 
-        youtube_id = comments_list[j].find('a', {'id': 'author-text'}).span.text 
-        youtube_id = youtube_id.replace('\n', '') # 줄 바뀜 없애기 
-        youtube_id = youtube_id.replace('\t', '') # 탭 줄이기 
-        youtube_id = youtube_id.strip() 
-        ## 댓글 좋아요 개수 (0인 경우 예외 처리) 
-        try: 
-            like_num = comments_list[j].find('span', {'id': 'vote-count-middle', 'class': 'style-scope ytd-comment-action-buttons-renderer', 'aria-label': re.compile('좋아요')}).text 
-            like_num = toInteger(like_num)
-            like_num = like_num.strip() 
-        except: 
-            like_num = 0 
-        data = {'comment': comment, 'like_num': like_num, 'youtube_id': youtube_id} 
-        data_list.append(data) 
-
-    #### 혜원님이 DB 만들어주시면 DB에 올리는 함수 호출
-    
-    return [comment_num, data_list]
 
 def initial():
     # 셀레니움 옵션 설정 
@@ -194,14 +160,15 @@ def channel_collector(tasklist, url, driver):
 def main(channel_url):
     channel_url= urllib.parse.unquote(channel_url)
     tasklist = []
+    youtube_api_key = 'AIzaSyCEwR4BXNL_ZxJgy6JTBcu2_wYuwS3RnDo'
     driver = initial()
     channel_collector(tasklist, channel_url, driver)
     for task in tasklist:
-        print(task)
         url = task['video_url']
-        comment_scrapped = comment_scrap(url, driver)
-        comment_num = comment_scrapped[0]
-        datalist = comment_scrapped[1]
+        print(url)
+        comment_num = get_comment_num(url, driver)
+        video_id = url.split('watch?v=')[-1]
+        datalist = get_comment_and_likes(youtube_api_key, video_id)        #여기에 댓글 원문과 댓글 좋아요 수가 리스트로 저장됨.
         task['comment_num'] = int(comment_num.replace(',',''))
         content = Database.Content(task['id'], task['video_url'], task['video_name'], task['thumbnail'], task['hits'], task['comment_num'])
         Database.insert_content(content)
@@ -211,9 +178,9 @@ def main(channel_url):
         # Rawcomment 객체 생성해서 DB에 저장.
         # data = {'comment': comment, 'like_num': like_num, 'youtube_id': youtube_id}
         for data in datalist:
-            r = Database.Rcomment(data['comment'], data['like_num'])
+            r = Database.Rcomment(data[0], data[1])
             Database.insert_raw_comment(recognize, r)
-
+    print('끝')
 
 if __name__=="__main__":
     channel_url = input()
