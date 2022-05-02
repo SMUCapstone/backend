@@ -69,8 +69,10 @@ class Content():
     def recognize(self):
     #recognize 속성 설정
     #대시를 언더바로 치환(별칭테이블 이름에 대시 사용 불가)
+    #등호를 언더바로 치환
         rec = self.id + self.url[-3:]
         rec = rec.replace("-","_")
+        rec = rec.replace("=","_")
         return rec
 
 
