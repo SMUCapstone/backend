@@ -10,10 +10,10 @@ import pymysql
 import pandas as pd
 from pymysql.err import IntegrityError
 
-#db connection (aws mysql 서버)
+#db connection (구글 클라우드 서버)
 def get_connection():
-    conn = pymysql.connect(host = 'capstone.cyh0mfc8nj8f.ap-northeast-2.rds.amazonaws.com', user = 'admin', password = 'capstone22', 
-                       db="capstone", charset = 'utf8')
+    conn = pymysql.connect(host = '34.64.73.86', user = 'root', password = '2017', 
+                       db="capstoneDB", charset = 'utf8')
     return conn
 
 
