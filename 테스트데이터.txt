@@ -13,8 +13,8 @@ def testYoutuber():
 
 # ***** 입력값 예시 *******
 # 유튜버 객체 생성 후 insert_youtuber_info(u) 실행
-# 테스트 할 때 아래의 u 객체 id('jimin')에 다른 값 입력해서 수행 (중복값 입력시 sql 오류)
-u = Youtuber('jimin', 'serendipity', 'http:sdfghjklsdfgh')
+# 테스트 할 때 아래의 u 객체 id('sehun')에 다른 값 입력해서 수행 (중복값 입력시 sql 오류)
+u = Youtuber('sehun', 'wind', 'http:sdfghjklsdfgh')
 insert_youtuber_info(u)
 
 data = testYoutuber()
