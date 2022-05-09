@@ -10,10 +10,10 @@ import pymysql
 import pandas as pd
 from pymysql.err import IntegrityError
 
-#db connection (구글 클라우드 서버)
+#db connection (vpc 서버)
 def get_connection():
-    conn = pymysql.connect(host = '34.64.73.86', user = 'root', password = '2017', 
-                       db="capstoneDB", charset = 'utf8')
+    conn = pymysql.connect(host = '34.64.210.99', user = 'root', password = '2017', 
+                       db="capstoneDB", charset = 'utf8mb4')
     return conn
 
 
