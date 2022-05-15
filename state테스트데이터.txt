@@ -1,0 +1,17 @@
+#유튜버 생성
+u = Youtuber('suho', 'h2o', 'http://qwerty')
+insert_youtuber_info(u)
+testYoutuber()
+
+#content 레코드 생성, state 값이 -1(초기값)인지 확인
+c = Content('suho', 'http:// qwerty', 'water', 'http://', 100,100)
+insert_content(c)
+testContent()
+
+#수집중인 상태로 값 변경 메소드 호출 -> 0인지 확인
+update_state_ing('suhorty')
+testContent()
+
+#완료상태로 값 변경 메소드 호출 -> 1인지 확인
+update_state_done('suhorty')
+testContent()
