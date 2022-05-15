@@ -75,17 +75,23 @@ class Content():
         rec = rec.replace("=","_")
         return rec
 
+    @property
+    def state(self):
+    #댓글 정보 가져왔는지 상태확인
+    # -1: before, 0: ing, 1: done
+    # 기본값 -1
+        return -1
 
 #insert_content 메소드
 def insert_content(c):
     '콘텐츠 정보 객체 받아서 sql 작성 후 정보 입력'
-    sql = """insert into content(id, url, recognize, video_name,thumbnail, hits, comment_num) values(%s, %s, %s, %s, %s, %s, %s)"""
+    sql = """insert into content(id, url, recognize, video_name,thumbnail, hits, comment_num, state) values(%s, %s, %s, %s, %s, %s, %s, %s)"""
     
     try:
         conn = get_connection()
         curs = conn.cursor(pymysql.cursors.DictCursor)
         
-        curs.execute(sql,(c.id, c.url, c.recognize, c.video_name, c.thumbnail, c.hits, c.comment_num ))
+        curs.execute(sql,(c.id, c.url, c.recognize, c.video_name, c.thumbnail, c.hits, c.comment_num, c.state ))
         conn.commit()
 
     except IntegrityError:
@@ -97,9 +103,46 @@ def insert_content(c):
     finally:
         conn.commit()
         curs.close()
+        
+#콘텐츠의 식별정보(별칭)을 입력받음
+#별칭테이블 최초 생성 시, 댓글 수집 시작하기 직전에 호출
+def update_state_ing(recognize):
+    sql = "update content set state = 0 where recognize = '"+ recognize +"'"
 
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
         
+        curs.execute(sql)
+        conn.commit()
         
+    except Exception as errmsg:
+        print(errmsg)
+        
+    finally:
+        conn.commit()
+        curs.close()
+
+      
+#콘텐츠의 식별정보(별칭)을 입력받음
+#댓글 수집을 마친 후 호출
+def update_state_done(recognize):
+    sql = "update content set state = 1 where recognize = '"+ recognize +"'"
+
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
+        
+        curs.execute(sql)
+        conn.commit()
+        
+    except Exception as errmsg:
+        print(errmsg)
+        
+    finally:
+        conn.commit()
+        curs.close()   
+
 
 # show_another_3_video 메소드
 def show_another_3_video(c):
