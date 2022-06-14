@@ -12,7 +12,7 @@ from pymysql.err import IntegrityError
 
 #db connection (vpc 서버)
 def get_connection():
-    conn = pymysql.connect(host = '34.64.72.243', user = 'root', password = '2017', 
+    conn = pymysql.connect(host = '34.64.113.15', user = 'root', password = '2017', 
                        db="capstoneDB", charset = 'utf8mb4')
     return conn
 
