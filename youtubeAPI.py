@@ -23,13 +23,15 @@ class youtubeAPI:
     def get_contents(self):
         response = self.api_obj.channels().list(part='contentDetails', id='UCLAgUdDB5AacEGtPqyTBD0w').execute()
         uploads = response['items'][0]['contentDetails']['relatedPlaylists']['uploads']
-        response = self.api_obj.playlistItems().list(part='snippet', playlistId=uploads).execute()
         # 결과값으로 나온 upload 값을 이용.
         response = self.api_obj.playlistItems().list(part='snippet', playlistId=uploads).execute()
         #response['items'] 안에 리스트가 플레이리스트고, 기본값으로 5개씩 리턴, maxResults 속성 최대값
         # 은 50 , 더 있을경우 ['nextPageToken'] 리턴
         # 제목 ['snippet']['title']
         # 썸네일 ['snippet']['thumbnails']['standard']['url']
+        # url 은 
+        # 조회수는
+        # 댓글 수는
 
     def get_playlist(self):
         response = self.api_obj.commentThreads().list(part='snippet,replies', videoId=video_id, maxResults=100).execute()
