@@ -29,6 +29,6 @@ def test_search():
     result = json.loads(requests.get(url, params=payload).text)['items']
     result = [{'channelId':item['snippet']['channelId'], 'Channelname':item['snippet']['channelTitle'], 'thumbnail':item['snippet']['thumbnails']['high']['url']} for item in result]
     print(result)
-    return {'items':result}  
+    return {'items':result}
 
-app.run(debug=True)
+app.run(host='0.0.0.0', debug=True)
