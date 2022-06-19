@@ -25,8 +25,10 @@ def test_search():
     query = all_args.get('q','')
     maxResults = all_args.get('maxResults','10')
     url = 'https://www.googleapis.com/youtube/v3/search'
-    payload = {'q':query,'maxResults':maxResults if maxResults else '10', 'key':'AIzaSyBug-zl91U0prwpaI2LgBIg_UHQrv5DP8A'}
+    
+    payload = {'q':query,'maxResults':maxResults if maxResults else '10', 'key':'AIzaSyBug-zl91U0prwpaI2LgBIg_UHQrv5DP8A','part':'snippet', 'type':'channel' }
     result = json.loads(requests.get(url, params=payload).text)['items']
+    print(result)
     result = [{'channelId':item['snippet']['channelId'], 'Channelname':item['snippet']['channelTitle'], 'thumbnail':item['snippet']['thumbnails']['high']['url']} for item in result]
     print(result)
     return {'items':result}
