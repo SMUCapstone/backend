@@ -1,10 +1,12 @@
 from flask import Flask, request
+from flask_cors import CORS
 import DB_Test as db
 import requests
 import json
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
+CORS(app)
 
 @app.route('/')
 def hello_pybo():
