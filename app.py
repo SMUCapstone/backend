@@ -21,12 +21,12 @@ def test_youtuber():
 
 @app.route('/channels')
 def test_search():
-    data = db.testYoutuber()
     all_args = request.args.to_dict()
     query = all_args.get('q','')
     maxResults = all_args.get('maxResults','10')
-    url = f'https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&maxResults={maxResults}&q={query}&key=AIzaSyBug-zl91U0prwpaI2LgBIg_UHQrv5DP8A'
-    result = json.loads(requests.get(url).text)['items']
+    url = 'https://www.googleapis.com/youtube/v3/search'
+    payload = {'q':query,'maxResults':maxResults if maxResults else '10', 'key':'AIzaSyBug-zl91U0prwpaI2LgBIg_UHQrv5DP8A'}
+    result = json.loads(requests.get(url, params=payload).text)['items']
     result = [{'channelId':item['snippet']['channelId'], 'Channelname':item['snippet']['channelTitle'], 'thumbnail':item['snippet']['thumbnails']['high']['url']} for item in result]
     print(result)
     return {'items':result}  
