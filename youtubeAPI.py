@@ -2,6 +2,8 @@ import pandas
 from googleapiclient.discovery import build
 import time
 import Database
+import requests
+import json
  
 class youtubeAPI:
     def __init__(self, api_key):
@@ -11,10 +13,12 @@ class youtubeAPI:
         self.like = 0
         self.pageToken = '' 
 
-    def get_youtuber(self):
-        youtuber_ID = ''
-        channel_name = ''
-        profile_img = ''
+    def get_youtuber(self, channelId):
+        url = f'https://www.googleapis.com/youtube/v3/channels?id={channelId}&part=snippet&part=statistics&key={self.api_key}'
+        result = json.loads(requests.get(url).text)['items'][0]
+        youtuber_ID = channelId
+        channel_name = result['snippet']['title']
+        profile_img = result['snippet']['thumbnails']['high']['url']
         ## 유튜버 테이블 만들기, 중복에러는 DB에서 처리// 유튜버id, 채널명, 프로필 이미지
         youtuber_info = Database.Youtuber(youtuber_ID, channel_name, profile_img)
 
