@@ -1,3 +1,4 @@
+from multiprocessing.dummy import Array
 import pandas
 from googleapiclient.discovery import build
 import time
@@ -24,25 +25,33 @@ class youtubeAPI:
 
         Database.insert_youtuber_info(youtuber_info)
         
-    def get_contents(self):
+    def get_contents(self, pageToken = ''):
+        resultArr = []
         response = self.api_obj.channels().list(part='contentDetails', id='UCLAgUdDB5AacEGtPqyTBD0w').execute()
         uploads = response['items'][0]['contentDetails']['relatedPlaylists']['uploads']
-        # 결과값으로 나온 upload 값을 이용.
-        response = self.api_obj.playlistItems().list(part='snippet', playlistId=uploads).execute()
-        #response['items'] 안에 리스트가 플레이리스트고, 기본값으로 5개씩 리턴, maxResults 속성 최대값
-        # 은 50 , 더 있을경우 ['nextPageToken'] 리턴
-        # 제목 ['snippet']['title']
-        # 썸네일 ['snippet']['thumbnails']['standard']['url']
-        # 아래 세 개는 Videos 수행해야함 인자는 playlistItems에서 얻은 id= 비디오 id, part는 snippet, statistics
-        # url 은 
-        # 조회수는 
-        # 댓글 수는 
+        # 결과값으로 나온 uploads 값을 이용.
+        if pageToken:
+            response = self.api_obj.playlistItems().list(part='snippet', playlistId=uploads, pageToken = pageToken, maxResults = 30).execute()
+        else:
+            response = self.api_obj.playlistItems().list(part='snippet', playlistId=uploads, maxResults = 30).execute()
+        nextPageToken = response.get('nextPageToken', '')
+        prevPageToken = response.get('prevPageToken', '')
+        for item in response['items']:
+            videoid = item['snippet']['resourceId']['videoId']
+            title =  ['snippet']['title']
+            thumbnail = ['snippet']['thumbnails']['standard']['url']
+            response = self.api_obj.videos().list(part='snippet, statistics', id=videoid).execute()
+            url = f'www.youtube.com/watch?={videoid}'
+            hits =  response['items'][0]['statistics']['viewCount']
+            comment_num =  response['items'][0]['statistics']['commentCount']
+            resultArr.append({'id':videoid, 'video_name':title, 'thumbnail':thumbnail, 'video_url': url, 'hits':hits, 'comment_num': comment_num})
+        return {'nextPageToken':nextPageToken, 'prevPageToken':prevPageToken,  'data':resultArr}
 
-    def get_playlist(self):
-        response = self.api_obj.commentThreads().list(part='snippet,replies', videoId=video_id, maxResults=100).execute()
-        # 유튜버 아이디, url, 동영상 title, 동영상 썸네일, 조회수, 댓글 수
-        content = Database.Content(task['id'], task['video_url'], task['video_name'], task['thumbnail'], task['hits'], task['comment_num'])
-        Database.insert_content(content)
+    def put_contents(self, inputDict):
+        #inputDict 는 딕셔너리의 어레이
+        for video in inputDict:
+            content = Database.Content(video['id'], video['video_url'], video['video_name'], video['thumbnail'], video['hits'], video['comment_num'])
+            Database.insert_content(content)
 
     def get_comment_and_likes(self, video_id):
         def remove_a_tag(string):
