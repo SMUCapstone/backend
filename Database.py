@@ -400,3 +400,32 @@ def search(key):
     finally:
         conn.commit()
         curs.close()
+
+####### 운영 delYoutuber(채널id) +++++++++++++++++++++============================================================
+def delYoutuber(id):
+    # '유튜버 등록 삭제하기'
+    sql = f"delete from youtuber where id='{id}'"
+    
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
+        
+        #sql 실행하여 몇행 반환하는지 num에 저장, result에 결과값 저장
+        num = curs.execute(sql)
+        result = curs.fetchall()
+   
+    except Exception as errmsg:
+        print(errmsg)
+        
+    finally:
+        conn.commit()
+        curs.close()
+
+def getYoutuber():
+    conn = get_connection()
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    sql = "select * from youtuber"
+    curs.execute(sql)
+    result = curs.fetchall()
+    data = pd.DataFrame(result)
+    return data

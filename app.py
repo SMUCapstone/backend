@@ -1,6 +1,6 @@
 from flask import Flask, request
 from flask_cors import CORS
-import DB_Test as db
+import Database as db
 from youtubeAPI import youtubeAPI
 import requests
 import json
@@ -14,10 +14,10 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 def hello_pybo():
     return 'Hello, Pybo!'
 
-@app.route('/youtubers',methods=['GET', 'POST'])
+@app.route('/youtubers',methods=['GET', 'POST', 'DELETE'])
 def youtuber():
     if(request.method =='GET'):
-        data = db.testYoutuber()
+        data = db.getYoutuber()
         result = []
         for i in range(len(data.id)):
             result.append({'id':data.id[i], 'channel':data.channel[i], 'profile':data.profile[i]})
@@ -27,6 +27,14 @@ def youtuber():
         if channelId:
             yt.get_youtuber(channelId)
             return {"response":"save success!"}
+        else:
+            return {"response":"invalid input type"}
+    elif(request.method == 'DELETE'):
+        channelId = request.get_json().get('id','')
+        print(channelId)
+        if channelId:
+            db.delYoutuber(channelId)
+            return {"response":"delete success!"}
         else:
             return {"response":"invalid input type"}
 
@@ -40,7 +48,6 @@ def search():
     'https://www.googleapis.com/youtube/v3/search?key=AIzaSyBug-zl91U0prwpaI2LgBIg_UHQrv5DP8A&part=snippet&type=channel&q=백종원&maxResults=1'
     payload = {'q':query,'maxResults':maxResults if maxResults else '10', 'key':'AIzaSyBug-zl91U0prwpaI2LgBIg_UHQrv5DP8A','part':'snippet', 'type':'channel' }
     result = json.loads(requests.get(url, params=payload).text)['items']
-    print(result)
     result = [{'channelId':item['snippet']['channelId'], 'Channelname':item['snippet']['channelTitle'], 'thumbnail':item['snippet']['thumbnails']['high']['url']} for item in result]
     return {'items':result}
 
