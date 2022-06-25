@@ -33,9 +33,10 @@ class youtubeAPI:
         # 은 50 , 더 있을경우 ['nextPageToken'] 리턴
         # 제목 ['snippet']['title']
         # 썸네일 ['snippet']['thumbnails']['standard']['url']
+        # 아래 세 개는 Videos 수행해야함 인자는 playlistItems에서 얻은 id= 비디오 id, part는 snippet, statistics
         # url 은 
-        # 조회수는
-        # 댓글 수는
+        # 조회수는 
+        # 댓글 수는 
 
     def get_playlist(self):
         response = self.api_obj.commentThreads().list(part='snippet,replies', videoId=video_id, maxResults=100).execute()

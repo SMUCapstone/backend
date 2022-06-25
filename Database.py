@@ -410,8 +410,7 @@ def delYoutuber(id):
         conn = get_connection()
         curs = conn.cursor(pymysql.cursors.DictCursor)
         
-        #sql 실행하여 몇행 반환하는지 num에 저장, result에 결과값 저장
-        num = curs.execute(sql)
+        curs.execute(sql)
         result = curs.fetchall()
    
     except Exception as errmsg:
