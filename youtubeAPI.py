@@ -43,7 +43,7 @@ class youtubeAPI:
         for item in response['items']:
             videoid = item['id']['videoId']
             title =  item['snippet']['title']
-            thumbnail = item['snippet']['thumbnails']['standard']['url']
+            thumbnail = item['snippet']['thumbnails']['high']['url']
             response = self.api_obj.videos().list(part='snippet, statistics', id=videoid).execute()
             url = f'www.youtube.com/watch?={videoid}'
             hits =  response['items'][0]['statistics']['viewCount']
