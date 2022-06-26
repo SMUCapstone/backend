@@ -41,9 +41,9 @@ class youtubeAPI:
         nextPageToken = response.get('nextPageToken', '')
         prevPageToken = response.get('prevPageToken', '')
         for item in response['items']:
-            videoid = item['snippet']['id']['videoId']
-            title =  ['snippet']['title']
-            thumbnail = ['snippet']['thumbnails']['standard']['url']
+            videoid = item['id']['videoId']
+            title =  item['snippet']['title']
+            thumbnail = item['snippet']['thumbnails']['standard']['url']
             response = self.api_obj.videos().list(part='snippet, statistics', id=videoid).execute()
             url = f'www.youtube.com/watch?={videoid}'
             hits =  response['items'][0]['statistics']['viewCount']
