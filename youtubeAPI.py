@@ -48,13 +48,13 @@ class youtubeAPI:
             url = f'www.youtube.com/watch?={videoid}'
             hits =  response['items'][0]['statistics']['viewCount']
             comment_num =  response['items'][0]['statistics']['commentCount']
-            resultArr.append({'id':videoid, 'video_name':title, 'thumbnail':thumbnail, 'video_url': url, 'hits':hits, 'comment_num': comment_num})
+            resultArr.append({'id':videoid, 'video_name':title, 'thumbnail':thumbnail, 'video_url': url, 'hits':hits, 'comment_num': comment_num, 'cid':CID})
         return {'nextPageToken':nextPageToken, 'prevPageToken':prevPageToken,  'data':resultArr}
 
     def put_contents(self, inputDict):
         #inputDict 는 딕셔너리의 어레이
         for video in inputDict:
-            content = Database.Content(video['id'], video['video_url'], video['video_name'], video['thumbnail'], video['hits'], video['comment_num'])
+            content = Database.Content(video['cid'], video['video_url'], video['video_name'], video['thumbnail'], video['hits'], video['comment_num'])
             Database.insert_content(content)
 
     def get_comment_and_likes(self, video_id):

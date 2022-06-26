@@ -31,7 +31,6 @@ def youtuber():
             return {"response":"invalid input type"}
     elif(request.method == 'DELETE'):
         channelId = request.get_json().get('id','')
-        print(channelId)
         if channelId:
             db.delYoutuber(channelId)
             return {"response":"delete success!"}
@@ -52,18 +51,37 @@ def search():
     return {'items':result}
 
 
-@app.route('/contents')
+@app.route('/contents',methods=['GET', 'POST', 'DELETE'])
 def contents():
-    all_args = request.args.to_dict()
-    channelId = all_args.get('channelId','')
-    pageToken = all_args.get('pageToken','')
-    if not channelId:
-        return ''
-    if pageToken:
-        result = yt.get_contents(channelId, pageToken)
-    else:
-        result = yt.get_contents(channelId)
-    
-    return result
+    if(request.method =='GET'):
+        all_args = request.args.to_dict()
+        fromDB = all_args.get('fromDB','')
+        channelId = all_args.get('channelId','')
+        pageToken = all_args.get('pageToken','')
+        if not channelId:
+            return ''
+
+        if fromDB:
+            data = db.getContent(channelId)
+            result = []
+            for i in range(len(data.id)):
+                result.append({'id':data.id[i], 'url':data.url[i], 'recognize':data.recognize[i], 'video_name':data.video_name[i], 'thumbnail':data.thumbnail[i], 'hits':str(data.hits[i]), 'comment_num':str(data.comment_num[i]), 'state':str(data.state[i]) })
+            return {'result': result}
+
+        if pageToken:
+            result = yt.get_contents(channelId, pageToken)
+        else:
+            result = yt.get_contents(channelId)
+        return result
+
+    elif(request.method == 'POST'):
+        contArr = request.get_json().get('contArr','')
+        if contArr:
+            yt.put_contents(contArr)
+            return {"response":"save success!"}
+        else:
+            return {"response":"invalid input type"}
+
+
 
 app.run(host='0.0.0.0', debug=True)

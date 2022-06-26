@@ -428,3 +428,12 @@ def getYoutuber():
     result = curs.fetchall()
     data = pd.DataFrame(result)
     return data
+
+def getContent(channelId):
+    conn = get_connection()
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    sql = f"select * from content where id='{channelId}'"
+    curs.execute(sql)
+    result = curs.fetchall()
+    data = pd.DataFrame(result)
+    return data
