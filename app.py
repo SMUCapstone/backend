@@ -11,8 +11,8 @@ app.config['JSON_AS_ASCII'] = False
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 @app.route('/')
-def hello_pybo():
-    return 'Hello, Pybo!'
+def hello():
+    return 'Hello, world!'
 
 @app.route('/youtubers',methods=['GET', 'POST', 'DELETE'])
 def youtuber():
@@ -50,5 +50,20 @@ def search():
     result = json.loads(requests.get(url, params=payload).text)['items']
     result = [{'channelId':item['snippet']['channelId'], 'Channelname':item['snippet']['channelTitle'], 'thumbnail':item['snippet']['thumbnails']['high']['url']} for item in result]
     return {'items':result}
+
+
+@app.route('/contents')
+def contents():
+    all_args = request.args.to_dict()
+    channelId = all_args.get('channelId','')
+    pageToken = all_args.get('pageToken','')
+    if not channelId:
+        return ''
+    if pageToken:
+        result = yt.get_contents(channelId)
+    else:
+        result = yt.get_contents(channelId, pageToken)
+    
+    return result
 
 app.run(host='0.0.0.0', debug=True)
