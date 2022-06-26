@@ -60,9 +60,9 @@ def contents():
     if not channelId:
         return ''
     if pageToken:
-        result = yt.get_contents(channelId)
-    else:
         result = yt.get_contents(channelId, pageToken)
+    else:
+        result = yt.get_contents(channelId)
     
     return result
 
