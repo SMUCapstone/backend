@@ -74,6 +74,7 @@ def contents():
             result = yt.get_contents(channelId)
         return result
 
+
     elif(request.method == 'POST'):
         contArr = request.get_json().get('contArr','')
         if contArr:
