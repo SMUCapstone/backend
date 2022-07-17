@@ -66,7 +66,7 @@ def contents():
             result = []
             for i in range(len(data.id)):
                 result.append({'id':data.id[i], 'url':data.url[i], 'recognize':data.recognize[i], 'video_name':data.video_name[i], 'thumbnail':data.thumbnail[i], 'hits':str(data.hits[i]), 'comment_num':str(data.comment_num[i]), 'state':str(data.state[i]) })
-            return {'result': result}
+            return {'data': result}
 
         if pageToken:
             result = yt.get_contents(channelId, pageToken)
