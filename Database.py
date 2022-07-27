@@ -105,9 +105,28 @@ def insert_content(c):
         curs.close()
         
 #콘텐츠의 식별정보(별칭)을 입력받음
-#별칭테이블 최초 생성 시, 댓글 수집 시작하기 직전에 호출
-def update_state_ing(recognize):
+#댓글 수집 요청 (state = 0)
+def update_state_request(recognize):
     sql = "update content set state = 0 where recognize = '"+ recognize +"'"
+
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
+        
+        curs.execute(sql)
+        conn.commit()
+        
+    except Exception as errmsg:
+        print(errmsg)
+        
+    finally:
+        conn.commit()
+        curs.close()
+        
+#콘텐츠의 식별정보(별칭)을 입력받음
+#댓글 수집 작업중 (state = 1)
+def update_state_ing(recognize):
+    sql = "update content set state = 1 where recognize = '"+ recognize +"'"
 
     try:
         conn = get_connection()
@@ -125,9 +144,9 @@ def update_state_ing(recognize):
 
       
 #콘텐츠의 식별정보(별칭)을 입력받음
-#댓글 수집을 마친 후 호출
+#댓글 수집 작업 완료 (state = 100)
 def update_state_done(recognize):
-    sql = "update content set state = 1 where recognize = '"+ recognize +"'"
+    sql = "update content set state = 100 where recognize = '"+ recognize +"'"
 
     try:
         conn = get_connection()
