@@ -16,20 +16,20 @@ def hello():
 
 @app.route('/youtubers',methods=['GET', 'POST', 'DELETE'])
 def youtuber():
-    if(request.method =='GET'):
+    if request.method =='GET':
         data = db.getYoutuber()
         result = []
         for i in range(len(data.id)):
             result.append({'id':data.id[i], 'channel':data.channel[i], 'profile':data.profile[i]})
         return {'result': result}
-    elif(request.method == 'POST'):
+    elif request.method == 'POST':
         channelId = request.get_json().get('id','')
         if channelId:
             yt.get_youtuber(channelId)
             return {"response":"save success!"}
         else:
             return {"response":"invalid input type"}
-    elif(request.method == 'DELETE'):
+    elif request.method == 'DELETE':
         channelId = request.get_json().get('id','')
         if channelId:
             db.delYoutuber(channelId)
@@ -53,7 +53,7 @@ def search():
 
 @app.route('/contents',methods=['GET', 'POST', 'DELETE'])
 def contents():
-    if(request.method =='GET'):
+    if request.method =='GET':
         all_args = request.args.to_dict()
         fromDB = all_args.get('fromDB','')
         channelId = all_args.get('channelId','')
@@ -75,7 +75,7 @@ def contents():
         return result
 
 
-    elif(request.method == 'POST'):
+    elif request.method == 'POST':
         contArr = request.get_json().get('contArr','')
         if contArr:
             yt.put_contents(contArr)
