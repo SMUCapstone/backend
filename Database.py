@@ -483,18 +483,21 @@ def update_last_page(recognize, page):
 def search_request_state():
     'content테이블에서 수행중(state = 0)인 row 1개 선택'
     
-    sql = "select recognize from content where state = 0 Limit 1"
+    sql = "select recognize, url from content where state = 0 Limit 1"
     
     try:
         conn = get_connection()
         curs = conn.cursor(pymysql.cursors.DictCursor)
         
         curs.execute(sql)
-        recognize = curs.fetchall()
+        result = curs.fetchall()
         
-        # 검색 결과 있음 -> recognize 리턴
-        if(recognize):
-            return recognize
+        # 검색 결과 있음 -> recognize, url 리턴
+        if(result):
+            df = pd.DataFrame(result)
+            recognize = df.loc[0,'recognize']
+            url = df.loc[0,'url']
+            return recognize, url
         
         # 검색 결과 없음 -> -1 리턴
         else:
