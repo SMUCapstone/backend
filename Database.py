@@ -456,3 +456,53 @@ def getContent(channelId):
     result = curs.fetchall()
     data = pd.DataFrame(result)
     return data
+
+def update_last_page(recognize, page):
+    'page token 업데이트'
+    sql = "update content set last_page = '" + page + "' where recognize = '" + recognize +"'"
+    
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
+        
+        # 키 없이 업데이트 수행할 때 발생하는 오류 방지하기 위해 safe모드 해제
+        safe_unlock = "set sql_safe_updates=0"
+        curs.execute(safe_unlock)
+        
+        curs.execute(sql)
+        conn.commit()
+        
+    except Exception as errmsg:
+        print(errmsg)
+        
+    finally:
+        conn.commit()
+        curs.close()
+
+
+def search_request_state():
+    'content테이블에서 수행중(state = 0)인 row 1개 선택'
+    
+    sql = "select recognize from content where state = 0 Limit 1"
+    
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
+        
+        curs.execute(sql)
+        recognize = curs.fetchall()
+        
+        # 검색 결과 있음 -> recognize 리턴
+        if(recognize):
+            return recognize
+        
+        # 검색 결과 없음 -> -1 리턴
+        else:
+            return -1
+        
+    except Exception as errmsg:
+        print(errmsg)
+        
+    finally:
+        conn.commit()
+        curs.close()
