@@ -74,12 +74,12 @@ class youtubeAPI:
         while response:
             for item in response['items']:
                 comment = item['snippet']['topLevelComment']['snippet']
-                comments.append([remove_a_tag(comment['textDisplay']), comment['likeCount']])
+                comments.append([remove_a_tag(comment['textDisplay']), comment.get('likeCount','0')])
         
                 if item['snippet']['totalReplyCount'] > 0:
                     for reply_item in item['replies']['comments']:
                         reply = reply_item['snippet']
-                        comments.append([remove_a_tag(reply['textDisplay']), reply['likeCount']])
+                        comments.append([remove_a_tag(reply['textDisplay']), reply.get('likeCount','0')])
         
             if 'nextPageToken' in response:
                 try:
