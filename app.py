@@ -83,6 +83,14 @@ def contents():
         else:
             return {"response":"invalid input type"}
 
-
+@app.route('/scrape',methods=['GET'])
+def scrape():
+    if request.method =='GET':
+        all_args = request.args.to_dict()
+        recognize = all_args.get('channelId','')
+        if not recognize:
+            return ''
+        db.update_state_request(recognize)
+        return 'success'
 
 app.run(host='0.0.0.0', debug=True)
