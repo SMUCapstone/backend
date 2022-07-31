@@ -57,8 +57,10 @@ class youtubeAPI:
         for video in inputDict:
             content = Database.Content(video['cid'], video['video_url'], video['video_name'], video['thumbnail'], video['hits'], video['comment_num'])
             Database.insert_content(content)
+            Database.create_raw_comment_table(content.recognize)
+            
 
-    def get_comment_and_likes(self, video_id):
+    def get_comment_and_likes(self, recognize, video_id):
         def remove_a_tag(string):
             string = string.replace('<br>','')
             string = string.replace('&quot;','"')
@@ -67,29 +69,35 @@ class youtubeAPI:
                 string = string.replace(string[string.index('<a'):string.index('">')+2],'')
             return string
 
-        comments = list()
+        
         api_obj = self.api_obj
         response = api_obj.commentThreads().list(part='snippet,replies', videoId=video_id, maxResults=100).execute()
-
-        while response:
-            for item in response['items']:
-                comment = item['snippet']['topLevelComment']['snippet']
-                comments.append([remove_a_tag(comment['textDisplay']), comment.get('likeCount','0')])
-        
-                if item['snippet']['totalReplyCount'] > 0:
-                    for reply_item in item['replies']['comments']:
-                        reply = reply_item['snippet']
-                        comments.append([remove_a_tag(reply['textDisplay']), reply.get('likeCount','0')])
-        
-            if 'nextPageToken' in response:
-                try:
+        try:
+            while response:
+                for item in response['items']:
+                    comment = item['snippet']['topLevelComment']['snippet']
+                    r = Database.Rcomment(remove_a_tag(comment['textDisplay']), comment.get('likeCount','0'))
+                    Database.insert_raw_comment(recognize, r)
+            
+                    if item['snippet']['totalReplyCount'] > 0:
+                        try:
+                            for reply_item in item['replies']['comments']:
+                                reply = reply_item['snippet']
+                                r = Database.Rcomment(remove_a_tag(reply['textDisplay']), reply.get('likeCount','0'))
+                                Database.insert_raw_comment(recognize, r)
+                        except:
+                            pass
+            
+                if 'nextPageToken' in response:
+                    pageToken =  response['nextPageToken']
                     response = api_obj.commentThreads().list(part='snippet,replies', videoId=video_id, pageToken=response['nextPageToken'], maxResults=100).execute()
-                except:
-                    return response['nextPageToken']
-                    # self.pageToken = response['nextPageToken']
-                    # response = api_obj.commentThreads().list(part='snippet,replies', videoId=video_id, pageToken=response['nextPageToken'], maxResults=100).execute()
-            else:
-                return comments
+                else:
+                    response = ''
+            Database.update_state_done(recognize)
+
+        except:
+            Database.update_last_page(recognize, pageToken)
+
  
 if __name__=="__main__":
     # api_key = 'AIzaSyCEwR4BXNL_ZxJgy6JTBcu2_wYuwS3RnDo'    
