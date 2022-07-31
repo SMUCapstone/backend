@@ -87,7 +87,7 @@ def contents():
 def scrape():
     if request.method =='GET':
         all_args = request.args.to_dict()
-        recognize = all_args.get('channelId','')
+        recognize = all_args.get('recognize','')
         if not recognize:
             return ''
         db.update_state_request(recognize)
