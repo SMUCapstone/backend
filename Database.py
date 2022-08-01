@@ -457,6 +457,36 @@ def getContent(channelId):
     data = pd.DataFrame(result)
     return data
 
+def get_last_page(recognize):
+    conn = get_connection()
+    curs = conn.cursor(pymysql.cursors.DictCursor)
+    sql = f"select last_page from content where recognize='{recognize}'"
+    curs.execute(sql)
+    result = curs.fetchall()
+    return result
+
+def update_last_page_null(recognize):
+    'page token 업데이트'
+    sql = "update content set last_page = NULL where recognize = '" + recognize +"'"
+    
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
+        
+        # 키 없이 업데이트 수행할 때 발생하는 오류 방지하기 위해 safe모드 해제
+        safe_unlock = "set sql_safe_updates=0"
+        curs.execute(safe_unlock)
+        
+        curs.execute(sql)
+        conn.commit()
+        
+    except Exception as errmsg:
+        print(errmsg)
+        
+    finally:
+        conn.commit()
+        curs.close()
+
 def update_last_page(recognize, page):
     'page token 업데이트'
     sql = "update content set last_page = '" + page + "' where recognize = '" + recognize +"'"

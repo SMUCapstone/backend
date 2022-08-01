@@ -2,6 +2,8 @@ from multiprocessing.dummy import Array
 import pandas
 from googleapiclient.discovery import build
 import time
+
+from pymysql import NULL
 import Database
 import requests
 import json
@@ -69,9 +71,14 @@ class youtubeAPI:
                 string = string.replace(string[string.index('<a'):string.index('">')+2],'')
             return string
 
-        
+        res = Database.get_last_page(recognize)
+        cont = res[0].get('last_page')
         api_obj = self.api_obj
-        response = api_obj.commentThreads().list(part='snippet,replies', videoId=video_id, maxResults=100).execute()
+        if cont:
+            response = api_obj.commentThreads().list(part='snippet,replies', videoId=video_id, pageToken=cont, maxResults=100).execute()
+            Database.update_last_page_null(recognize)
+        else:
+            response = api_obj.commentThreads().list(part='snippet,replies', videoId=video_id, maxResults=100).execute()
         try:
             while response:
                 for item in response['items']:
