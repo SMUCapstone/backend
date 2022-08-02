@@ -490,7 +490,8 @@ def update_last_page_null(recognize):
 def update_last_page(recognize, page):
     'page token 업데이트'
     sql = "update content set last_page = '" + page + "' where recognize = '" + recognize +"'"
-    
+    conn = ''
+
     try:
         conn = get_connection()
         curs = conn.cursor(pymysql.cursors.DictCursor)
@@ -506,15 +507,17 @@ def update_last_page(recognize, page):
         print(errmsg)
         
     finally:
-        conn.commit()
-        curs.close()
+        if conn:
+            conn.commit()
+            curs.close()
 
 
 def search_request_state():
     'content테이블에서 수행중(state = 0)인 row 1개 선택'
     
     sql = "select recognize, url from content where state = 0 Limit 1"
-    
+    conn = ''
+
     try:
         conn = get_connection()
         curs = conn.cursor(pymysql.cursors.DictCursor)
@@ -537,8 +540,9 @@ def search_request_state():
         print(errmsg)
         
     finally:
-        conn.commit()
-        curs.close()
+        if conn:
+            conn.commit()
+            curs.close()
 
 ####### DB_Cache 테이블 ==================================================
 
@@ -571,7 +575,7 @@ def search_db_cache(request):
     'request에 해당하는 결과 있는지 확인'
     
     sql = "select jResult from DB_Cache where request = '" + request + "'"
-    
+    conn = ''
     try:
         conn = get_connection()
         curs = conn.cursor(pymysql.cursors.DictCursor)
@@ -591,7 +595,8 @@ def search_db_cache(request):
         
     except Exception as errmsg:
         print(errmsg)
-        
+
     finally:
-        conn.commit()
-        curs.close()
+        if conn:
+            conn.commit()
+            curs.close()
