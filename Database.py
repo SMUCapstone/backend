@@ -546,6 +546,7 @@ def insert_db_cache(request, jResult):
     'db캐시 정보 입력받아서 레코드 추가'
     
     sql = """insert into DB_Cache(request, jResult) values(%s, %s)"""
+    conn=''
     try:
         conn = get_connection()
         curs = conn.cursor(pymysql.cursors.DictCursor)
@@ -559,10 +560,11 @@ def insert_db_cache(request, jResult):
     except Exception as errmsg:
         print(errmsg)
         return 
-    
+
     finally:
-        conn.commit()
-        curs.close()
+        if conn:
+            conn.commit()
+            curs.close()
 
 
 def search_db_cache(request):
