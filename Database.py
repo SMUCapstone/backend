@@ -539,3 +539,57 @@ def search_request_state():
     finally:
         conn.commit()
         curs.close()
+
+####### DB_Cache 테이블 ==================================================
+
+def insert_db_cache(request, jResult):
+    'db캐시 정보 입력받아서 레코드 추가'
+    
+    sql = """insert into DB_Cache(request, jResult) values(%s, %s)"""
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
+        
+        curs.execute(sql,(request, jResult))
+        conn.commit()
+
+    except IntegrityError:
+        pass
+
+    except Exception as errmsg:
+        print(errmsg)
+        return 
+    
+    finally:
+        conn.commit()
+        curs.close()
+
+
+def search_db_cache(request):
+    'request에 해당하는 결과 있는지 확인'
+    
+    sql = "select jResult from DB_Cache where request = '" + request + "'"
+    
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
+        
+        curs.execute(sql)
+        result = curs.fetchall()
+        
+        # 검색 결과 있음 -> jResult 리턴
+        if(result):
+            df = pd.DataFrame(result)
+            jResult = df.loc[0,'jResult']
+            return jResult
+        
+        # 검색 결과 없음 -> None 리턴
+        else:
+            return None
+        
+    except Exception as errmsg:
+        print(errmsg)
+        
+    finally:
+        conn.commit()
+        curs.close()
