@@ -80,7 +80,7 @@ def contents():
             result = yt.get_contents(channelId, pageToken)
         else:
             result = yt.get_contents(channelId)
-        db.insert_db_cache(json.dumps(result))
+        db.insert_db_cache(json.dumps(payload), json.dumps(result))
         return result
 
 
