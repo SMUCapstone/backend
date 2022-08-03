@@ -72,10 +72,15 @@ def contents():
                 result.append({'id':data.id[i], 'url':data.url[i], 'recognize':data.recognize[i], 'video_name':data.video_name[i], 'thumbnail':data.thumbnail[i], 'hits':str(data.hits[i]), 'comment_num':str(data.comment_num[i]), 'state':str(data.state[i]) })
             return {'data': result}
 
+        payload = {'channelId':channelId, 'pageToken':pageToken}
+        is_cached = db.search_db_cache(json.dumps(payload))
+        if is_cached:
+            return json.loads(is_cached)
         if pageToken:
             result = yt.get_contents(channelId, pageToken)
         else:
             result = yt.get_contents(channelId)
+        db.insert_db_cache(json.dumps(result))
         return result
 
 
