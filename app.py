@@ -46,8 +46,12 @@ def search():
     url = 'https://www.googleapis.com/youtube/v3/search'
     'https://www.googleapis.com/youtube/v3/search?key=AIzaSyBug-zl91U0prwpaI2LgBIg_UHQrv5DP8A&part=snippet&type=channel&q=백종원&maxResults=1'
     payload = {'q':query,'maxResults':maxResults if maxResults else '10', 'key':'AIzaSyBug-zl91U0prwpaI2LgBIg_UHQrv5DP8A','part':'snippet', 'type':'channel' }
+    is_cached = db.search_db_cache(json.dumps(payload))
+    if is_cached:
+        return json.loads(is_cached)
     result = json.loads(requests.get(url, params=payload).text)['items']
     result = [{'channelId':item['snippet']['channelId'], 'channelname':item['snippet']['channelTitle'], 'thumbnail':item['snippet']['thumbnails']['high']['url']} for item in result]
+    db.insert_db_cache(json.dumps(payload),json.dumps({'items':result}))
     return {'items':result}
 
 
@@ -68,10 +72,15 @@ def contents():
                 result.append({'id':data.id[i], 'url':data.url[i], 'recognize':data.recognize[i], 'video_name':data.video_name[i], 'thumbnail':data.thumbnail[i], 'hits':str(data.hits[i]), 'comment_num':str(data.comment_num[i]), 'state':str(data.state[i]) })
             return {'data': result}
 
+        payload = {'channelId':channelId, 'pageToken':pageToken}
+        is_cached = db.search_db_cache(json.dumps(payload))
+        if is_cached:
+            return json.loads(is_cached)
         if pageToken:
             result = yt.get_contents(channelId, pageToken)
         else:
             result = yt.get_contents(channelId)
+        db.insert_db_cache(json.dumps(payload), json.dumps(result))
         return result
 
 
