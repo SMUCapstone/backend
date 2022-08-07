@@ -9,11 +9,12 @@ Created on Mon Apr  4 22:39:47 2022
 import pymysql
 import pandas as pd
 from pymysql.err import IntegrityError
+from pymysql.constants import CLIENT
 
 #db connection (vpc 서버)
 def get_connection():
     conn = pymysql.connect(host = '34.64.56.32', user = 'root', password = '2017', 
-                       db="capstoneDB", charset = 'utf8mb4')
+                       db="capstoneDB", charset = 'utf8mb4', client_flag=CLIENT.MULTI_STATEMENTS)
     return conn
 
 
@@ -513,9 +514,11 @@ def update_last_page(recognize, page):
 
 
 def search_request_state():
-    'content테이블에서 수행중(state = 0)인 row 1개 선택'
-    
-    sql = "select recognize, url from content where state = 0 Limit 1"
+    'content 테이블에서 수행중(state = 0)인 row 1개 선택'
+    sql = """
+    select recognize, url from content where state = 0 Limit 1;
+    update content set state=1 where recognize = (select A.recognize from (select recognize from content where state=0 Limit 1) A );
+    """
     conn = ''
 
     try:

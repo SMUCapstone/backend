@@ -11,7 +11,6 @@ while True:
     else:
         recognize, url = res
         print("message received 1", url)
-        db.update_state_ing(recognize)
         video_id = url.split('watch?v=')[-1]
         yt.get_comment_and_likes(recognize, video_id)
 
