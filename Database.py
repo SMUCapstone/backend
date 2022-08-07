@@ -527,9 +527,10 @@ def search_request_state():
         
         curs.execute(sql)
         result = curs.fetchall()
-        
+
         # 검색 결과 있음 -> recognize, url 리턴
         if(result):
+            conn.commit()
             df = pd.DataFrame(result)
             recognize = df.loc[0,'recognize']
             url = df.loc[0,'url']
@@ -544,7 +545,6 @@ def search_request_state():
         
     finally:
         if conn:
-            conn.commit()
             curs.close()
 
 ####### DB_Cache 테이블 ==================================================
