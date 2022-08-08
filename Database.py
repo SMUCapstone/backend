@@ -298,7 +298,7 @@ def get_archive_record(recognize):
 def create_raw_comment_table(recognize):
     'content테이블에서 별칭 이름 받아서 해당 영상의 raw comment 테이블 생성'
     
-    sql = "create table "+ recognize + "(comment varchar(10000), like_num int, response int);"
+    sql = "create table "+ recognize + "(etag varchar(27) primary key, comment varchar(16350), like_num int, response int default 1);"
     
     try:
         conn = get_connection()
@@ -317,38 +317,34 @@ def create_raw_comment_table(recognize):
         conn.commit()
         curs.close()
 
-
+'''
 # raw 코멘트 객체
 # response 속성 초기값 1
 class Rcomment():
-    def __init__ (self, comment, like_num):
+    def __init__ (self, etag, comment, like_num):
+        self.etag = etag
         self.comment = comment
         self.like_num = like_num
         
     @property
     def response(self):
         return 1
-
-
+'''
+    
 # insert_raw_comment 메소드
-def insert_raw_comment(recognize, r):
-    '별칭(테이블명), r코멘트 객체 입력 받아서 sql 작성 후 정보 입력'
+def insert_raw_comment(recognize, data):
+    '별칭(테이블명), data 입력 받아서 sql 작성 후 정보 입력'
     
-    # response 열 초기값: null 추후 update_response()로 정보 update
-    sql = "insert into " + recognize + "(comment, like_num, response) values(%s, %s, %s)"
-    
-    # insert전 unique 체크
-    check = "select * from " + recognize + " where comment = '" + r.comment + "'"
+    # response 열 초기값: 1 추후 update_response()로 정보 update
+    # 중복되는 etag값 있으면 무시(ignore)
+    sql = "insert ignore into " + recognize + "(etag, comment, like_num) values(%s, %s, %s)"
     
     try:
         conn = get_connection()
         curs = conn.cursor(pymysql.cursors.DictCursor)
-        
-        # unique 결과 값이 0(동일한 코멘트 없음)이면 R코멘트 insert
-        unique = curs.execute(check)
-        if(unique==0):
-            curs.execute(sql,(r.comment, r.like_num, r.response))
-            conn.commit()
+
+        curs.executemany(sql,data)
+        conn.commit()
 
     except IntegrityError:
         pass
@@ -361,21 +357,19 @@ def insert_raw_comment(recognize, r):
         curs.close()
 
 
+
+
 # 별칭 테이블 response열 업데이트 메소드
 # response 열 기본값은 1, 부정적 반응일때만 update_response 호출하여 0로 업데이트
 # 긍정반응보다 부정반응이 더 적을 것이라고 예상됨, 오버헤드 최소화
-# recognize(테이블 이름), r객체 입력받음
-def update_response(recognize, r):
-    '부정반응일때만 response열 0로 업데이트, comment = r.comment 완전일치로 찾아들어감'
-    sql = "update " + recognize + " set response = 0 where comment = '" + r.comment +"'"
+# recognize(테이블 이름), etag 입력받음
+def update_response(recognize, etag):
+    '부정반응일때만 response열 0로 업데이트, etag 일치 시 update 수행'
+    sql = "update " + recognize + " set response = 0 where etag = '" + etag +"'"
     
     try:
         conn = get_connection()
         curs = conn.cursor(pymysql.cursors.DictCursor)
-        
-        # 키 없이 업데이트 수행할 때 발생하는 오류 방지하기 위해 safe모드 해제
-        safe_unlock = "set sql_safe_updates=0"
-        curs.execute(safe_unlock)
         
         curs.execute(sql)
         conn.commit()
