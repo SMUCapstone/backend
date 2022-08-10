@@ -343,7 +343,7 @@ def insert_raw_comment(recognize, data):
         data[i][1] = data[i][1].replace("'", "\'")
         
         # 길이체크
-        if(len(data[i][1])> 16350):
+        if len(data[i][1])> 16350:
             data[i][1] = data[i][1][:16350]
         #print(data[i][1])
     
