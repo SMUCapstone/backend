@@ -335,17 +335,16 @@ class Rcomment():
 def insert_raw_comment(recognize, data):
     '별칭(테이블명), data 입력 받아서 sql 작성 후 정보 입력'
 
-    # 데이터 syntax check
-    for i in range(0, len(data)):
-        
+    for etag, comment, like in data:
         # 따옴표 처리
-        data[i][1] = data[i][1].replace('"', '\"')
-        data[i][1] = data[i][1].replace("'", "\'")
-        
+        comment = comment.replace('"', '\"')
+        comment = comment.replace("'", "\'")
+    
         # 길이체크
-        if len(data[i][1])> 16350:
-            data[i][1] = data[i][1][:16350]
-        #print(data[i][1])
+        if len(comment)> 16350:
+            comment = comment[:16350]
+        
+        #print(comment)
     
 
 
