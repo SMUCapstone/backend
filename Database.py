@@ -334,7 +334,20 @@ class Rcomment():
 # insert_raw_comment 메소드
 def insert_raw_comment(recognize, data):
     '별칭(테이블명), data 입력 받아서 sql 작성 후 정보 입력'
+
+    for etag, comment, like in data:
+        # 따옴표 처리
+        comment = comment.replace('"', '\"')
+        comment = comment.replace("'", "\'")
     
+        # 길이체크
+        if len(comment)> 16350:
+            comment = comment[:16350]
+        
+        #print(comment)
+    
+
+
     # response 열 초기값: 1 추후 update_response()로 정보 update
     # 중복되는 etag값 있으면 무시(ignore)
     sql = "insert ignore into " + recognize + "(etag, comment, like_num) values(%s, %s, %s)"
