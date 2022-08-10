@@ -336,17 +336,19 @@ def insert_raw_comment(recognize, data):
     '별칭(테이블명), data 입력 받아서 sql 작성 후 정보 입력'
 
     # 데이터 syntax check
-    i =0
-    while i < len(data):
-        # 길이체크
-        data[i][1] = data[i][1][:16350]
-    
+    for i in range(0, len(data)):
+        
         # 따옴표 처리
         data[i][1] = data[i][1].replace('"', '\"')
         data[i][1] = data[i][1].replace("'", "\'")
+        
+        # 길이체크
+        if(len(data[i][1])> 16350):
+            data[i][1] = data[i][1][:16350]
+        #print(data[i][1])
     
-        i += 1
-    
+
+
     # response 열 초기값: 1 추후 update_response()로 정보 update
     # 중복되는 etag값 있으면 무시(ignore)
     sql = "insert ignore into " + recognize + "(etag, comment, like_num) values(%s, %s, %s)"
