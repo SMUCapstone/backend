@@ -74,6 +74,7 @@ class youtubeAPI:
         res = Database.get_last_page(recognize)
         cont = res[0].get('last_page')
         api_obj = self.api_obj
+        data = []
         if cont:
             response = api_obj.commentThreads().list(part='snippet,replies', videoId=video_id, pageToken=cont, maxResults=100).execute()
             Database.update_last_page_null(recognize)
@@ -83,23 +84,30 @@ class youtubeAPI:
             while response:
                 for item in response['items']:
                     comment = item['snippet']['topLevelComment']['snippet']
-                    r = Database.Rcomment(remove_a_tag(comment['textDisplay']), comment.get('likeCount','0'))
-                    Database.insert_raw_comment(recognize, r)
+                    etag = item['snippet']['topLevelComment']['etag']
+                    data.append([etag, remove_a_tag(comment['textDisplay']), comment.get('likeCount','0')])
             
                     if item['snippet']['totalReplyCount'] > 0:
                         try:
                             for reply_item in item['replies']['comments']:
                                 reply = reply_item['snippet']
-                                r = Database.Rcomment(remove_a_tag(reply['textDisplay']), reply.get('likeCount','0'))
-                                Database.insert_raw_comment(recognize, r)
+                                etag = reply_item.get('etag')
+                                data.append([etag, remove_a_tag(reply['textDisplay']), reply.get('likeCount','0')])
                         except:
                             pass
+
+                    if len(data)>18000:
+                        Database.insert_raw_comment(recognize, data)
+                        data = []
             
                 if 'nextPageToken' in response:
                     pageToken =  response['nextPageToken']
                     response = api_obj.commentThreads().list(part='snippet,replies', videoId=video_id, pageToken=response['nextPageToken'], maxResults=100).execute()
                 else:
                     response = ''
+            if data:
+                Database.insert_raw_comment(recognize, data)
+                
             Database.update_state_done(recognize)
 
         except:
