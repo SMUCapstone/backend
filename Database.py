@@ -363,7 +363,8 @@ def insert_raw_comment(recognize, data):
         pass
 
     except Exception as errmsg:
-        print(errmsg)
+        # print(errmsg)
+        pass
         
     finally:
         conn.commit()
