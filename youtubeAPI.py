@@ -85,13 +85,16 @@ class youtubeAPI:
                 for item in response['items']:
                     comment = item['snippet']['topLevelComment']['snippet']
                     etag = item['snippet']['topLevelComment']['etag']
-                    data.append([etag, remove_a_tag(comment['textDisplay']), comment.get('likeCount','0')])
+                    if etag:
+                        data.append([etag, remove_a_tag(comment['textDisplay']), comment.get('likeCount','0')])
+                    else:
+                        print(item)
             
                     if item['snippet']['totalReplyCount'] > 0:
                         try:
                             for reply_item in item['replies']['comments']:
                                 reply = reply_item['snippet']
-                                etag = reply.get('etag')
+                                etag = reply_item.get('etag')
                                 data.append([etag, remove_a_tag(reply['textDisplay']), reply.get('likeCount','0')])
                         except:
                             pass
