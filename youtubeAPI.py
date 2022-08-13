@@ -91,7 +91,7 @@ class youtubeAPI:
                         try:
                             for reply_item in item['replies']['comments']:
                                 reply = reply_item['snippet']
-                                etag = reply_item.get('etag')
+                                etag = reply.get('etag')
                                 data.append([etag, remove_a_tag(reply['textDisplay']), reply.get('likeCount','0')])
                         except:
                             pass
@@ -107,7 +107,7 @@ class youtubeAPI:
                     response = ''
             if data:
                 Database.insert_raw_comment(recognize, data)
-                
+
             Database.update_state_done(recognize)
 
         except:
