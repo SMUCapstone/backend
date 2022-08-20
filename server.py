@@ -13,9 +13,10 @@ while True:
         pass
         # print("message received 0")
     else:
-        recognize, url = res
-        print("message received 1", url)
-        video_id = url.split('watch?v=')[-1]
+        recognize, yt_url = res
+        print("message received 1", yt_url)
+        video_id = yt_url.split('watch?v=')[-1]
         yt.get_comment_and_likes(recognize, video_id)
+        print('finished')
 
     time.sleep(1)
