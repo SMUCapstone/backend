@@ -102,9 +102,5 @@ def scrape():
         db.update_state_request(recognize)
         return 'success'
 
-@app.route('/jobs')
-def fifo():
-    res = db.search_request_state()
-    return {'result':res}
-
-app.run(host='0.0.0.0', debug=True)
+if __name__=='__main__':
+    app.run(host='0.0.0.0', debug=True)
