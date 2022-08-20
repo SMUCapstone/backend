@@ -5,7 +5,7 @@ import requests
 import json
 
 yt = youtubeAPI('AIzaSyBug-zl91U0prwpaI2LgBIg_UHQrv5DP8A')
-url = 'http://34.64.56.32:5000/jobs'
+url = 'http://34.64.56.32:5555/jobs'
 
 while True:
     res = json.loads(requests.get(url).text).get('result')
