@@ -7,7 +7,7 @@ from pymysql import NULL
 import Database
 import requests
 import json
- 
+
 class youtubeAPI:
     def __init__(self, api_key):
         self.api_key = api_key
