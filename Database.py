@@ -521,11 +521,11 @@ def update_last_page(recognize, page):
             curs.close()
 
 
-def search_request_state():
+def search_request_state(recognize):
     'content 테이블에서 수행중(state = 0)인 row 1개 선택'
-    sql = """
-    select recognize, url from content where state = 0 Limit 1;
-    update content set state=1 where recognize = (select A.recognize from (select recognize from content where state=0 Limit 1) A );
+    sql = f"""
+    select url from content where recognize='{recognize}';
+    update content set state=1 where recognize ='{recognize}';
     """
     conn = ''
 
@@ -536,17 +536,16 @@ def search_request_state():
         curs.execute(sql)
         result = curs.fetchall()
 
-        # 검색 결과 있음 -> recognize, url 리턴
-        if(result):
+        # 검색 결과 있음 -> url 리턴
+        if result:
             conn.commit()
             df = pd.DataFrame(result)
-            recognize = df.loc[0,'recognize']
             url = df.loc[0,'url']
-            return recognize, url
+            return url
         
-        # 검색 결과 없음 -> -1 리턴
+        # 검색 결과 없음 -> 빈 문자열 리턴
         else:
-            return -1
+            return ''
         
     except Exception as errmsg:
         print(errmsg)
