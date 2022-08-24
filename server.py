@@ -1,22 +1,36 @@
 from youtubeAPI import youtubeAPI
 import Database as db
-import time
-import requests
-import json
+import pika
 
-yt = youtubeAPI('AIzaSyBug-zl91U0prwpaI2LgBIg_UHQrv5DP8A')
-url = 'http://34.64.56.32:5555/jobs'
+class Consumer:
+    def __init__(self):
+        self.__url = '34.64.56.32'
+        self.__port = 5672
+        self.__vhost = 'youthat'
+        self.__cred = pika.PlainCredentials('admin', 'capstoneVPC')
+        self.__queue = 'pre-collect'
 
-while True:
-    res = json.loads(requests.get(url, verify=False).text).get('result')
-    if res==-1:
-        pass
-        # print("message received 0")
-    else:
-        recognize, yt_url = res
+    def on_message(channel, method_frame, header_frame, recognize):
+        recognize = str(recognize, 'utf-8')
+        print(recognize, type(recognize))
+        yt_url = db.search_request_state(recognize)
         print("message received 1", yt_url)
         video_id = yt_url.split('watch?v=')[-1]
         yt.get_comment_and_likes(recognize, video_id)
         print('finished')
 
-    time.sleep(1)
+    def consume(self):
+        conn = pika.BlockingConnection(pika.ConnectionParameters(self.__url, self.__port, self.__vhost, self.__cred))
+        chan = conn.channel()
+        chan.basic_consume(
+            queue = self.__queue, 
+            on_message_callback = Consumer.on_message,
+            auto_ack = False
+        )
+        chan.start_consuming()
+        return
+
+
+yt = youtubeAPI('AIzaSyBug-zl91U0prwpaI2LgBIg_UHQrv5DP8A')
+consumer = Consumer()
+consumer.consume()

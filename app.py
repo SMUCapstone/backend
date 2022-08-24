@@ -4,7 +4,28 @@ import Database as db
 from youtubeAPI import youtubeAPI
 import requests
 import json
+import pika
 
+class Publisher:
+    def __init__(self):
+        self.__url = '34.64.56.32'
+        self.__port = 5672
+        self.__vhost = 'youthat'
+        self.__cred = pika.PlainCredentials('admin', 'capstoneVPC')
+        self.__queue = 'pre-collect'
+
+    def publish(self, body):
+        conn = pika.BlockingConnection(pika.ConnectionParameters(self.__url, self.__port, self.__vhost, self.__cred))
+        chan = conn.channel()
+        chan.basic_publish(
+            exchange = '',
+            routing_key = self.__queue,
+            body = body
+        )
+        conn.close()
+        return
+
+publisher = Publisher()
 yt = youtubeAPI('AIzaSyBug-zl91U0prwpaI2LgBIg_UHQrv5DP8A')
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -44,7 +65,6 @@ def search():
     query = all_args.get('q','')
     maxResults = all_args.get('maxResults','10')
     url = 'https://www.googleapis.com/youtube/v3/search'
-    'https://www.googleapis.com/youtube/v3/search?key=AIzaSyBug-zl91U0prwpaI2LgBIg_UHQrv5DP8A&part=snippet&type=channel&q=백종원&maxResults=1'
     payload = {'q':query,'maxResults':maxResults if maxResults else '10', 'key':'AIzaSyBug-zl91U0prwpaI2LgBIg_UHQrv5DP8A','part':'snippet', 'type':'channel' }
     is_cached = db.search_db_cache(json.dumps(payload).replace('\\','\\\\'))
     if is_cached:
@@ -100,6 +120,7 @@ def scrape():
         if not recognize:
             return ''
         db.update_state_request(recognize)
+        publisher.publish(recognize)
         return 'success'
 
 if __name__=='__main__':
