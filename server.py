@@ -12,7 +12,6 @@ class Consumer:
 
     def on_message(channel, method_frame, header_frame, recognize):
         recognize = str(recognize, 'utf-8')
-        print(recognize, type(recognize))
         yt_url = db.search_request_state(recognize)
         print("message received 1", yt_url)
         video_id = yt_url.split('watch?v=')[-1]
