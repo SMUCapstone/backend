@@ -24,7 +24,7 @@ class Consumer:
         chan.basic_consume(
             queue = self.__queue, 
             on_message_callback = Consumer.on_message,
-            auto_ack = False
+            auto_ack = True
         )
         chan.start_consuming()
         return
