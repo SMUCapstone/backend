@@ -117,6 +117,7 @@ class youtubeAPI:
             Database.update_last_page(recognize, pageToken)
             if data:
                 Database.insert_raw_comment(recognize, data)
+            Database.update_state_request(recognize)
 
  
 if __name__=="__main__":
