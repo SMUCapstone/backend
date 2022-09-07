@@ -17,6 +17,11 @@ class youtubeAPI:
         self.like = 0
         self.pageToken = '' 
 
+    def get_related_video(self, video_id):
+        url = f'https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&relatedToVideoId={video_id}&maxResults=2&key={self.api_key}'
+        result = json.loads(requests.get(url).text)['items']
+        return result
+
     def get_youtuber(self, channelId):
         url = f'https://www.googleapis.com/youtube/v3/channels?id={channelId}&part=snippet&part=statistics&key={self.api_key}'
         result = json.loads(requests.get(url).text)['items'][0]

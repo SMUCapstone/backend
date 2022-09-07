@@ -124,5 +124,18 @@ def scrape():
         publisher.publish(recognize)
         return 'success'
 
+@app.route('/related',methods=['GET'])
+def related():
+    all_args = request.args.to_dict()
+    video_id = all_args.get('videoId','')
+    payload = {'videoId':video_id}
+    is_cached = db.search_db_cache(json.dumps(payload))
+    if is_cached:
+        return json.loads(is_cached)
+    else:
+        result = {'recommend':yt.get_related_video(video_id)}
+    db.insert_db_cache(json.dumps(payload), json.dumps(result))
+    return result
+
 if __name__=='__main__':
     app.run(host='0.0.0.0', debug=True)
