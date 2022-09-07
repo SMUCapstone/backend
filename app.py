@@ -26,7 +26,8 @@ class Publisher:
         return
 
 publisher = Publisher()
-yt = youtubeAPI('AIzaSyBug-zl91U0prwpaI2LgBIg_UHQrv5DP8A')
+# yt = youtubeAPI('AIzaSyBug-zl91U0prwpaI2LgBIg_UHQrv5DP8A')
+yt = youtubeAPI('AIzaSyCEwR4BXNL_ZxJgy6JTBcu2_wYuwS3RnDo')
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 CORS(app, resources={r"/*": {"origins": "*"}})
