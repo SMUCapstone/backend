@@ -7,6 +7,7 @@ from pymysql import NULL
 import Database
 import requests
 import json
+import re
 
 class youtubeAPI:
     def __init__(self, api_key):
@@ -64,8 +65,10 @@ class youtubeAPI:
 
     def get_comment_and_likes(self, recognize, video_id):
         def remove_a_tag(string):
-            string = string.replace('<br>','')
+            string = re.sub(r'<[^>]*>', '', string) 
             string = string.replace('&quot;','"')
+            string = string.replace('&amp;','&')
+            string = string.replace('&#39;','\'')
             if 'a href' in string:
                 string = string.replace('</a>','')
                 string = string.replace(string[string.index('<a'):string.index('">')+2],'')
