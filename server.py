@@ -30,6 +30,6 @@ class Consumer:
         return
 
 
-yt = youtubeAPI('AIzaSyBug-zl91U0prwpaI2LgBIg_UHQrv5DP8A')
+yt = youtubeAPI('AIzaSyCEwR4BXNL_ZxJgy6JTBcu2_wYuwS3RnDo')
 consumer = Consumer()
 consumer.consume()
