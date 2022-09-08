@@ -38,7 +38,7 @@ def find_timestamp(comments_list):
             freq = (len(time_dic.get(minus, [])) + len(time_dic.get(stamp, [])) + len(time_dic.get(plus, [])))/3
             average_freq[stamp] = freq
 
-            return average_freq
+        return average_freq
 
     time_dic = {}
     for comment in comments_list:
@@ -50,8 +50,8 @@ def find_timestamp(comments_list):
             time_dic[alt_stamp] = time_dic.get(alt_stamp,[]) + [comment]
     
     result = []
-    for x in dict(sorted(calc_mass(time_dic), key=lambda x:x[1], reverse=True)):
-        result.append({str(x):{'freq':len(comments_list[x]), 'comment':comments_list[x]}})
+    for x in dict(sorted(calc_mass(time_dic).items(), key=lambda x:x[1], reverse=True)):
+        result.append({str(x):{'freq':len(time_dic[x]), 'comment':time_dic[x]}})
 
         if len(result)>20:
             return result
@@ -65,7 +65,7 @@ def find_timestamp(comments_list):
 
 #####################################################################################################################
 # 워드클라우드 
-def make_wordcloud(comment_list):
+def make_wordcloud(comment_list, video_id):
     from wordcloud import WordCloud
     import matplotlib.pyplot as plt
     from collections import Counter
@@ -79,9 +79,9 @@ def make_wordcloud(comment_list):
     c = Counter(words)
     wc = WordCloud(font_path='malgun', width=600, height=400, scale=2.0, max_font_size=250, background_color='white')
     gen = wc.generate_from_frequencies(c)
-    plt.figure()
-    plt.imshow(gen)
-    wc.to_file('워드클라우드.png')
+    # plt.figure()
+    # plt.imshow(gen)
+    wc.to_file(f'{video_id}.png')
     result = {}
     res = dict(c)
     for x in list(dict(sorted(res.items(), key=lambda x:x[1], reverse=True)).keys())[:100]:

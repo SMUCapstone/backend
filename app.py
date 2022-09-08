@@ -144,23 +144,28 @@ def related():
 def analyze():
     all_args = request.args.to_dict()
     video_id = all_args.get('videoId','')
-    payload = {'type':'analyze','videoId':video_id}
+    comments = [x[1] for x in yt.get_comment_and_likes_3000(video_id)]
+    recommend_id1 = 'N7E90Je0pTw'
+    recommend_id2 = 'MorC3Q5E69w'
+    if not comments:
+        return 
+    # payload = {'type':'analyze','videoId':video_id}
     # is_cached = db.search_db_cache(json.dumps(payload))
     # if is_cached:
     #     return json.loads(is_cached)
     # else:
     result = {
         'thumbnail':{
-            'url':'https://i.ytimg.com/vi/ADRKCe5G5k4/hq720.jpg'
+            'url':f'https://i.ytimg.com/vi/{video_id}/hqdefault.jpg'
         },
         'recommend':[
             {
-                'thumb':'https://i.ytimg.com/vi/riJJQOo9lV4/hqdefault.jpg',
-                'url':'https://www.youtube.com/watch?v=riJJQOo9lV4'
+                'thumb':f'https://i.ytimg.com/vi/{recommend_id1}/hqdefault.jpg',
+                'url':f'https://www.youtube.com/watch?v={recommend_id1}'
             },
             {
-                'thumb':'https://i.ytimg.com/vi/TCBB1U0mbhI/hqdefault.jpg',
-                'url':'https://www.youtube.com/watch?v=TCBB1U0mbhI'
+                'thumb':f'https://i.ytimg.com/vi/{recommend_id2}/hqdefault.jpg',
+                'url':f'https://www.youtube.com/watch?v={recommend_id2}'
             }
         ],
         'sentimental':{
@@ -169,25 +174,9 @@ def analyze():
         },
         'bigdata':{
             'image':'https://lh3.googleusercontent.com/fife/AAbDypD5uowlKKYO1FnE85SLeyZOc9j6RE1ymyhOUsd8mDyQ3spHFp9kuMyB8XDEBCtewhKC7aewDgaH4WG7hTCvN0wh3zqEppfjyujHVEF8vVk2GdMJt5qgSd9D3qAQz2THhIzL5umSxmz_JXGzm-V1vjDPGb8YZ4OnADTxaxY8d52XhUwDT5f5t9sDVmT0T81Kw2Bpz3hRgTtFBKbJgEtF14PtKd2r49S6UmcwR2gInqNUq0PnKlX7TycmjOqTAo8rGVj8R1aLR9J5V8iMlFLpWaVdd3XJdplcXAJiXTUc0JoQD8g2DVGlelYIl0qxExjnMGl9yMSg1sq1veeH5jqHlbwb5H-ni-_42tRZVaeaEimnOS41L4JxOeYE0xdt-uDvCu-eo4atoTe92w9DtuVQ0KEBZFEsMaimNit-MNUGyxOKMWFiiuCkUlH2dvXZt7LIcWSwYhrhMG1FHEUp_28RqRfqs6x-KhlX0Z0XC45rlmxHc1pL1MBScjJCSpIHn_P8sV6iHghQ1cwKU85eI-GLTb3lmBPG7eiLU04CJXEUGJGLt9OxwiHg51-17kquNelIoU8zo1N5XYCuHJ_UimgKQgFbN6RpT_HJhCDP1NttgSTC3bYTLcbLwDdq-2sIOuILikQCd0Vau998o_puLzlflgUT-MPs0dvbBCbesyrkhNG46VvjalctM2TNCwo7RpR53X73tW4ziGnNnSccc2JKcJC_e3Ye5XfV2aQQPduyywEFsQhzL0dcp_oNm-GnHO0Ljs1PYhDaH_w4e94CjHGth20sZbBzkyUcOj2_oABDeysMpiODVxbYV1Y7gZGZvIp_PKyMEyXmRRjZ_Hyr4YcdepKhqaoJAvETAG7qYi4MtbuRzpHlk0uLSZwoD3fbUIl77m-jjpLI2aNgZo94pjOzengyM4Cg4U3VvUXWRwYC438wIm_GTsINzRR9d-mjQp2zSZvrOYdWPgNcxlocMHS_tW9IadLWNG2HOnqNUdAbtmFJ4d9HhTBoYxaWtXDYV6Yge2U6Y8G1PusDlrvqz0ciUKcyWFpIl2WLdRA6JreG3K_4HzEgBq5ITaMGQolOWaBSqDPiIv-gFu4jGheZzphrTC3juLuCzJXjxkxKXhvM7Dtnz4x47po1DLAFTSnOT6Jehavh9GjfwWKhYs0uolFYSogx7_xBN4GKg9FpOji5zvK4JiNi5caEFJ8EuhtVEc1J37CMlWdjoSZ5Cwt8CBsNTJvcLyMt36xc5Fuz25lCy1D6ekgVwAikXUAwktXejaLdx9USSKuZr50nCxJAzxayMcH3VI7QmoFFi09TBjgIcuw=w1875-h895',
-            'comments':{'진짜': 435, '영상': 384, '언니': 287, '오늘': 145, '사람': 145, '보고': 143, '정보': 134, '사랑': 131, '정말': 120, '생각': 112, '그냥': 101, '나영': 95, '추천': 93, '스타일': 91, '신발': 90, '얼굴': 89, '바지': 86, '실장': 84, '느낌': 83, '항상': 82, '패션': 79, '제품': 79, '한별': 79, '지금': 78, '어디': 72, 
-'여자': 72, '댓글': 68, '브랜드': 67, '하나': 67, '머리': 63, '남자': 63, '요리': 61, '구매': 60, '요즘': 58, '가방': 57, '최고': 57, '가요': 53, '부츠': 52, '한번': 51, '코디': 50, '정도': 50, '모델': 49, '고민': 49, '처음': 48, '혹시': 48, '이번': 48, '명품': 48, '여기': 47, '운동': 47, '응원': 45, '사이즈': 45, '유행': 44, '역시': 44, '마지막': 44, '도움': 44, '겨울': 43, '때문': 43, '제일': 42, '몸매': 42, '엄마': 42, '뭔가': 42, '나이키': 42, '부분': 41, '형님': 41, '블랙': 40, '대박': 40, '아이유': 40, '설명': 39, '우리': 39, '완전': 39, '선생님': 39, '이준': 38, '컨텐츠': 38, '가격': 38, '구독': 37, '당신': 37, '다른': 37, '주우': 37, '시간': 36, '피부': 36, '이제': 35, '보기': 35, '니트': 35, '다리': 35, '여름': 34, '누나': 34, '원피스': 34, '사진': 34, '사고': 33, 
-'아시': 33, '팬츠': 33, '유튜브': 33, '하루': 33, '기분': 32, '목소리': 32, '바로': 32, '계속': 32, '와이드': 32, '꿀팁': 32, '라인': 32
-            }
+            'comments':make_wordcloud(comments, video_id)
         },
-        'timestamp':[
-            {
-                '01:20':{
-                    'freq':'123',
-                    'comments':['1:20 댓글내용 1', '댓글내용 2 1:20', '댓글내용1:20 3']
-                }
-            },
-            {
-                '03:14':{
-                    'freq':'109',
-                    'comments':['3:14 댓글내용 1', '댓글내용 2 3:14', '댓글내용3:14 3']
-                }
-            }
-        ]
+        'timestamp':find_timestamp(comments)
     }
     # db.insert_db_cache(json.dumps(payload), json.dumps(result))
     return result
@@ -220,7 +209,6 @@ def popular():
         }
     }
     return result
-
 
 if __name__=='__main__':
     app.run(host='0.0.0.0', debug=True)

@@ -127,7 +127,53 @@ class youtubeAPI:
                 Database.insert_raw_comment(recognize, data)
             Database.update_state_request(recognize)
 
- 
+
+    def get_comment_and_likes_3000(self, video_id):
+        def remove_a_tag(string):
+            string = re.sub(r'<[^>]*>', '', string) 
+            string = string.replace('&quot;','"')
+            string = string.replace('&amp;','&')
+            string = string.replace('&#39;','\'')
+            if 'a href' in string:
+                string = string.replace('</a>','')
+                string = string.replace(string[string.index('<a'):string.index('">')+2],'')
+            return string
+
+        api_obj = self.api_obj
+        data = []
+        response = api_obj.commentThreads().list(part='snippet,replies', videoId=video_id, maxResults=100).execute()
+        try:
+            while response:
+                for item in response['items']:
+                    comment = item['snippet']['topLevelComment']['snippet']
+                    etag = item['snippet']['topLevelComment']['etag']
+                    if etag:
+                        data.append([etag, remove_a_tag(comment['textDisplay']), comment.get('likeCount','0')])
+                    else:
+                        print(item)
+            
+                    if item['snippet']['totalReplyCount'] > 0:
+                        try:
+                            for reply_item in item['replies']['comments']:
+                                reply = reply_item['snippet']
+                                etag = reply_item.get('etag')
+                                data.append([etag, remove_a_tag(reply['textDisplay']), reply.get('likeCount','0')])
+                        except:
+                            pass
+
+                    if len(data)>3000:
+                        return data
+            
+                if 'nextPageToken' in response:
+                    pageToken =  response['nextPageToken']
+                    response = api_obj.commentThreads().list(part='snippet,replies', videoId=video_id, pageToken=response['nextPageToken'], maxResults=100).execute()
+                else:
+                    response = ''
+                return data
+        except:
+            return 'error'
+
+
 if __name__=="__main__":
     # api_key = 'AIzaSyCEwR4BXNL_ZxJgy6JTBcu2_wYuwS3RnDo'    
     api_key = 'AIzaSyBug-zl91U0prwpaI2LgBIg_UHQrv5DP8A'     ## 발급받은 api 키
