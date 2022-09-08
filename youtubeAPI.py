@@ -7,6 +7,7 @@ from pymysql import NULL
 import Database
 import requests
 import json
+import re
 
 class youtubeAPI:
     def __init__(self, api_key):
@@ -15,6 +16,11 @@ class youtubeAPI:
         self.comment = []
         self.like = 0
         self.pageToken = '' 
+
+    def get_related_video(self, video_id):
+        url = f'https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&relatedToVideoId={video_id}&maxResults=2&key={self.api_key}'
+        result = json.loads(requests.get(url).text)['items']
+        return result
 
     def get_youtuber(self, channelId):
         url = f'https://www.googleapis.com/youtube/v3/channels?id={channelId}&part=snippet&part=statistics&key={self.api_key}'
@@ -64,8 +70,10 @@ class youtubeAPI:
 
     def get_comment_and_likes(self, recognize, video_id):
         def remove_a_tag(string):
-            string = string.replace('<br>','')
+            string = re.sub(r'<[^>]*>', '', string) 
             string = string.replace('&quot;','"')
+            string = string.replace('&amp;','&')
+            string = string.replace('&#39;','\'')
             if 'a href' in string:
                 string = string.replace('</a>','')
                 string = string.replace(string[string.index('<a'):string.index('">')+2],'')
