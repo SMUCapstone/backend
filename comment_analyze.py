@@ -1,5 +1,12 @@
 import re 
 # 딕셔너리에 저장하기 ( {시간:[댓글]} )
+def remove_tag(string):
+    string = re.sub(r'<[^>]*>', '', string) 
+    string = string.replace('&quot;','"')
+    string = string.replace('&amp;','&')
+    string = string.replace('&#39;','\'')
+    return string
+
 def find_timestamp(comments_list):
     # 밀집도 계산, 좌우 1초 잡아서 초당 평균 등장 횟수 계산
     def calc_mass(time_dic):
