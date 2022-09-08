@@ -35,25 +35,25 @@ class youtubeAPI:
         
     def get_contents(self, CID, pageToken = ''):
         resultArr = []
-        # response = self.api_obj.channels().list(part='contentDetails', id='UCLAgUdDB5AacEGtPqyTBD0w').execute()
-        # uploads = response['items'][0]['contentDetails']['relatedPlaylists']['uploads']
-        # # 결과값으로 나온 uploads 값을 이용.
-        # if pageToken:
-        #     response = self.api_obj.playlistItems().list(part='snippet', playlistId=uploads, pageToken = pageToken, maxResults = 30).execute()
-        # else:
-        #     response = self.api_obj.playlistItems().list(part='snippet', playlistId=uploads, maxResults = 30).execute()
+        response = self.api_obj.channels().list(part='contentDetails', id=CID).execute()
+        uploads = response['items'][0]['contentDetails']['relatedPlaylists']['uploads']
+        # 결과값으로 나온 uploads 값을 이용.
         if pageToken:
-            response = self.api_obj.search().list(part='snippet', channelId=CID, pageToken = pageToken, order='viewCount', type='video', maxResults = 30).execute()
+            response = self.api_obj.playlistItems().list(part='snippet', playlistId=uploads, pageToken = pageToken, maxResults = 50).execute()
         else:
-            response = self.api_obj.search().list(part='snippet', channelId=CID, order='viewCount', type='video', maxResults = 30).execute()
+            response = self.api_obj.playlistItems().list(part='snippet', playlistId=uploads, maxResults = 50).execute()
+        # if pageToken:
+        #     response = self.api_obj.search().list(part='snippet', channelId=CID, pageToken = pageToken, order='viewCount', type='video', maxResults = 30).execute()
+        # else:
+        #     response = self.api_obj.search().list(part='snippet', channelId=CID, order='viewCount', type='video', maxResults = 30).execute()
         nextPageToken = response.get('nextPageToken', '')
         prevPageToken = response.get('prevPageToken', '')
         for item in response['items']:
-            videoid = item['id']['videoId']
+            videoid = item['snippet']['resourceId']['videoId']
             print(videoid)
             title =  item['snippet']['title']
             thumbnail = item['snippet']['thumbnails']['high']['url']
-            response = self.api_obj.videos().list(part='snippet, statistics', id=videoid).execute()
+            response = self.api_obj.videos().list(part='statistics', id=videoid).execute()
             url = f'www.youtube.com/watch?v={videoid}'
             hits =  response['items'][0]['statistics'].get('viewCount','0')
             comment_num =  response['items'][0]['statistics'].get('commentCount','0')
