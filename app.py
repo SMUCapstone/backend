@@ -151,17 +151,21 @@ def analyze():
     else:
         result = {
             'thumbnail':{
-                'url':'동영상 썸네일 링크'
+                'url':'https://i.ytimg.com/vi/ADRKCe5G5k4/hq720.jpg'
             },
             'recommend':[
                 {
-                    'thumb':'동영상 썸네일 링크',
-                    'url':'동영상 링크'
+                    'thumb':'https://i.ytimg.com/vi/riJJQOo9lV4/hqdefault.jpg',
+                    'url':'https://www.youtube.com/watch?v=riJJQOo9lV4'
+                },
+                {
+                    'thumb':'https://i.ytimg.com/vi/TCBB1U0mbhI/hqdefault.jpg',
+                    'url':'https://www.youtube.com/watch?v=TCBB1U0mbhI'
                 }
             ],
             'sentimental':{
-                'pos':12,
-                'neg':88
+                'pos':88,
+                'neg':12
             },
             'bigdata':{
                 'image':'이미지 링크',
@@ -175,13 +179,13 @@ def analyze():
                 {
                     '01:20':{
                         'freq':'123',
-                        'comments':[]
+                        'comments':['1:20 댓글내용 1', '댓글내용 2 1:20', '댓글내용1:20 3']
                     }
                 },
                 {
-                    '01:20':{
+                    '03:14':{
                         'freq':'109',
-                        'comments':[]
+                        'comments':['3:14 댓글내용 1', '댓글내용 2 3:14', '댓글내용3:14 3']
                     }
                 }
             ]
