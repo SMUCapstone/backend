@@ -610,3 +610,97 @@ def search_db_cache(request):
         if conn:
             conn.commit()
             curs.close()
+
+
+
+
+
+
+
+
+####### searched_video 테이블 ==================================================
+def searched_video(recognize):
+    'recognize(콘텐츠 id) 입력 받아서 레코드 추가'
+    
+    conn=''
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
+        
+        # recognize로 히스토리 조회
+        history_sql = "select times from searched_video where recognize = '" + recognize + "'" 
+        curs.execute(history_sql)
+        result = curs.fetchall()
+        #print(result)
+        
+        if(result):
+            # 히스토리 존재 -> times 카운트 up
+            df = pd.DataFrame(result)
+            count = df.loc[0,'times']
+            count = count+1
+            #print(count)
+            
+            increase = "update searched_video set times = " + str(count) + " where recognize = '" + recognize + "'"
+            curs.execute(increase)
+            
+        else:
+            # 레코드 추가, times 기본값 1
+            sql = """insert into searched_video(recognize) values(%s)"""
+            curs.execute(sql,(recognize))
+            
+    except IntegrityError:
+        pass
+
+    except Exception as errmsg:
+        print(errmsg)
+        return 
+
+    finally:
+        if conn:
+            conn.commit()
+            curs.close()
+
+
+
+
+####### searched_channel 테이블 ==================================================
+def searched_channel(id):
+    '유튜버 id 입력 받아서 레코드 추가'
+    
+    conn=''
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
+        
+        # 유튜버 id로 히스토리 조회
+        history_sql = "select times from searched_channel where id = '" + id + "'" 
+        curs.execute(history_sql)
+        result = curs.fetchall()
+        #print(result)
+        
+        if(result):
+            # 히스토리 존재 -> times 카운트 up
+            df = pd.DataFrame(result)
+            count = df.loc[0,'times']
+            count = count+1
+            #print(count)
+            
+            increase = "update searched_channel set times = " + str(count) + " where id = '" + id + "'"
+            curs.execute(increase)
+            
+        else:
+            # 레코드 추가, times 기본값 1
+            sql = """insert into searched_channel(id) values(%s)"""
+            curs.execute(sql,(id))
+            
+    except IntegrityError:
+        pass
+
+    except Exception as errmsg:
+        print(errmsg)
+        return 
+
+    finally:
+        if conn:
+            conn.commit()
+            curs.close()
