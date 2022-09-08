@@ -5,6 +5,7 @@ from youtubeAPI import youtubeAPI
 import requests
 import json
 import pika
+from comment_analyze import *  
 
 class Publisher:
     def __init__(self):
@@ -136,6 +137,55 @@ def related():
         return json.loads(is_cached)
     else:
         result = {'recommend':yt.get_related_video(video_id)}
+    db.insert_db_cache(json.dumps(payload), json.dumps(result))
+    return result
+
+@app.route('/analyze',methods=['GET'])
+def analyze():
+    all_args = request.args.to_dict()
+    video_id = all_args.get('videoId','')
+    payload = {'type':'analyze','videoId':video_id}
+    is_cached = db.search_db_cache(json.dumps(payload))
+    if is_cached:
+        return json.loads(is_cached)
+    else:
+        result = {
+            'thumbnail':{
+                'url':'동영상 썸네일 링크'
+            },
+            'recommend':[
+                {
+                    'thumb':'동영상 썸네일 링크',
+                    'url':'동영상 링크'
+                }
+            ],
+            'sentimental':{
+                'pos':12,
+                'neg':88
+            },
+            'bigdata':{
+                'image':'이미지 링크',
+                'comments':{
+                    '법률':'72',
+                    '대통령':'42',
+                    '국가':'12'
+                }
+            },
+            'timestamp':[
+                {
+                    '01:20':{
+                        'freq':'123',
+                        'comments':[]
+                    }
+                },
+                {
+                    '01:20':{
+                        'freq':'109',
+                        'comments':[]
+                    }
+                }
+            ]
+        }
     db.insert_db_cache(json.dumps(payload), json.dumps(result))
     return result
 
