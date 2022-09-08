@@ -139,5 +139,35 @@ def related():
     db.insert_db_cache(json.dumps(payload), json.dumps(result))
     return result
 
+@app.route('/popular',methods=['GET'])
+def popular():
+    # DB에서 channelId와 videoId를 꺼내온다
+    channel_id = ''
+    video_id = '' 
+    url = f'https://www.googleapis.com/youtube/v3/channels?id={channel_id}&part=snippet&part=statistics&key={yt.api_key}'
+    # response = json.loads(requests.get(url).text)['items'][0]
+    # channel_name = response['snippet']['title']
+    # profile_img = response['snippet']['thumbnails']['high']['url']
+    # subscribers = response['statistics'].get('subscriberCount','0')
+    result = {
+        'channel':{
+            'channelId': 'UC3SyT4_WLHzN7JmHQwKQZww',
+            'channelName': '이지금 [IU Official]',
+            'thumbnail': 'https://yt3.ggpht.com/ytc/AMLnZu-UWvwHCKwBxSfbMOjy5D2z03jrZz4hnOWyksk1gw=s88-c-k-c0x00ffffff-no-rj-mo',
+            'channelHits': '8050000' #혹시 채널 조회수도 얻을 수 있을까요?? 힘드시면 빼도 될 것 같아요
+        }, #많이 분석한 채널 객체
+        'video':{
+            'cid': 'UC_gkwRB-p1JrOzzJk7PBKDQ',
+            'comment_num': '2861',
+            'hits': '6445799',
+            'id': 'fmn7aswQUdQ',
+            'thumbnail': 'https://i.ytimg.com/vi/fmn7aswQUdQ/hqdefault.jpg',
+            'video_name' : '한국 여자 직장인 출근룩 국룰 #shorts #lookbook #룩북 #패션',
+            'video_url': 'www.youtube.com/watch?=fmn7aswQUdQ'
+        }
+    }
+    return result
+
+
 if __name__=='__main__':
     app.run(host='0.0.0.0', debug=True)
