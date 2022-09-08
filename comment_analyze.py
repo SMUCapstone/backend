@@ -56,8 +56,6 @@ def find_timestamp(comments_list):
         if len(result)>20:
             return result
     return result
-
-        
     
 
 # comment_list = ['1:34','1:35','1:3602:084:02 lol😂I heard hobi tho🥴🥴 lmao and many more 😂😂😂It was so cool to watch your blogg   now i wanna travel too😭😭😭', '0:00 0:00 0:00 내가 제일 좋아하는 부분','0:00']
@@ -76,32 +74,24 @@ def make_wordcloud(comment_list):
     import numpy as np
 
     text = " ".join(comment_list)
-
+    text = comment_list
     okt = Okt()
     nouns = okt.nouns(text) # 명사만 추출
-
     words = [n for n in nouns if len(n) > 1] # 단어의 길이가 1개인 것은 제외
-
     c = Counter(words)
-
-    wc = WordCloud(font_path='malgun', width=400, height=400, scale=2.0, max_font_size=250)
+    wc = WordCloud(font_path='malgun', width=600, height=400, scale=2.0, max_font_size=250, background_color='white')
     gen = wc.generate_from_frequencies(c)
     plt.figure()
     plt.imshow(gen)
-    wc.to_file('법전_워드클라우드.png')
+    wc.to_file('워드클라우드.png')
+    result = {}
+    res = dict(c)
+    for x in list(dict(sorted(res.items(), key=lambda x:x[1], reverse=True)).keys())[:100]:
+        result[x] = res[x]
+    return result
 
-    return dict(c)
+# with open('KakaoTalk_20220908_1612_12_006.txt', 'r', encoding='utf-8') as f:
+#     text = f.read()
+# text = re.sub(r'\[[^\]]*\]', '', text) 
+# res = make_wordcloud(text)
 
-################################################################################################
-import requests
-from bs4 import BeautifulSoup
-
-url = 'https://www.youtube.com/watch?v=fYyWM0i2lbk'
-
-response = requests.get(url)
-
-if response.status_code == 200:
-    html = response.text
-    soup = BeautifulSoup(html, 'html.parser')
-
-title = soup.select('#related')
