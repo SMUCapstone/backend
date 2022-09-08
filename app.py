@@ -73,6 +73,7 @@ def search():
     payload = {'q':query,'maxResults':maxResults if maxResults else '10', 'key':yt.api_key,'part':'snippet', 'type':'channel' }
     result = json.loads(requests.get(url, params=payload).text)['items']
     result = [{'channelId':item['snippet']['channelId'], 'channelname':item['snippet']['channelTitle'], 'thumbnail':item['snippet']['thumbnails']['high']['url']} for item in result]
+    payload['key']='AIzaSyBug-zl91U0prwpaI2LgBIg_UHQrv5DP8A'
     db.insert_db_cache(json.dumps(payload),json.dumps({'items':result}))
     return {'items':result}
 
