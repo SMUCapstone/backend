@@ -72,9 +72,7 @@ def make_wordcloud(comment_list):
     from konlpy.tag import Okt
     from PIL import Image
     import numpy as np
-
     text = " ".join(comment_list)
-    text = comment_list
     okt = Okt()
     nouns = okt.nouns(text) # 명사만 추출
     words = [n for n in nouns if len(n) > 1] # 단어의 길이가 1개인 것은 제외
@@ -89,6 +87,12 @@ def make_wordcloud(comment_list):
     for x in list(dict(sorted(res.items(), key=lambda x:x[1], reverse=True)).keys())[:100]:
         result[x] = res[x]
     return result
+
+# import csv
+ 
+# f = open('c1.csv', 'r', encoding='utf-8')
+# rdr = csv.reader(f)
+# comments = [x[1] for x in rdr]
 
 # with open('KakaoTalk_20220908_1612_12_006.txt', 'r', encoding='utf-8') as f:
 #     text = f.read()
