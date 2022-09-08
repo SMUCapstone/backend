@@ -633,7 +633,7 @@ def searched_video(recognize):
         result = curs.fetchall()
         #print(result)
         
-        if(result):
+        if result:
             # 히스토리 존재 -> times 카운트 up
             df = pd.DataFrame(result)
             count = df.loc[0,'times']
@@ -648,6 +648,34 @@ def searched_video(recognize):
             sql = """insert into searched_video(recognize) values(%s)"""
             curs.execute(sql,(recognize))
             
+    except IntegrityError:
+        pass
+
+    except Exception as errmsg:
+        print(errmsg)
+        return 
+
+    finally:
+        if conn:
+            conn.commit()
+            curs.close()
+
+
+
+def most_searched_video():
+    '가장 많이 검색된 콘텐츠의 recognize 반환'
+    conn=''
+    sql = "select recognize from searched_video order by times desc limit 1"
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
+        
+        curs.execute(sql)
+        result = curs.fetchall()
+        df = pd.DataFrame(result)
+        recognize = df.loc[0,'recognize']
+        return recognize
+    
     except IntegrityError:
         pass
 
@@ -678,7 +706,7 @@ def searched_channel(id):
         result = curs.fetchall()
         #print(result)
         
-        if(result):
+        if result:
             # 히스토리 존재 -> times 카운트 up
             df = pd.DataFrame(result)
             count = df.loc[0,'times']
@@ -693,6 +721,33 @@ def searched_channel(id):
             sql = """insert into searched_channel(id) values(%s)"""
             curs.execute(sql,(id))
             
+    except IntegrityError:
+        pass
+
+    except Exception as errmsg:
+        print(errmsg)
+        return 
+
+    finally:
+        if conn:
+            conn.commit()
+            curs.close()
+
+
+def most_searched_channel():
+    '가장 많이 검색된 채널의 id 반환'
+    conn=''
+    sql = "select id from searched_channel order by times desc limit 1"
+    try:
+        conn = get_connection()
+        curs = conn.cursor(pymysql.cursors.DictCursor)
+        
+        curs.execute(sql)
+        result = curs.fetchall()
+        df = pd.DataFrame(result)
+        id = df.loc[0,'id']
+        return id
+    
     except IntegrityError:
         pass
 
