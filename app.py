@@ -70,6 +70,7 @@ def search():
     is_cached = db.search_db_cache(json.dumps(payload).replace('\\','\\\\'))
     if is_cached:
         return json.loads(is_cached)
+    payload = {'q':query,'maxResults':maxResults if maxResults else '10', 'key':yt.api_key,'part':'snippet', 'type':'channel' }
     result = json.loads(requests.get(url, params=payload).text)['items']
     result = [{'channelId':item['snippet']['channelId'], 'channelname':item['snippet']['channelTitle'], 'thumbnail':item['snippet']['thumbnails']['high']['url']} for item in result]
     db.insert_db_cache(json.dumps(payload),json.dumps({'items':result}))
