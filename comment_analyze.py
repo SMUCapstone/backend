@@ -82,10 +82,8 @@ def make_wordcloud(comment_list, video_id):
     gen = wc.generate_from_frequencies(c)
     # plt.figure()
     # plt.imshow(gen)
-    wc.to_file(f'{video_id}.png')
-    files = open(f'{video_id}.png', 'rb')
-    upload = {'file': files}
-    res = requests.post('http://34.64.56.32:3333/image/', files = upload)
+    wc.to_file(f'/home/images/{video_id}.png')
+
     result = {}
     res = dict(c)
     for x in list(dict(sorted(res.items(), key=lambda x:x[1], reverse=True)).keys())[:100]:
