@@ -141,9 +141,9 @@ def analyze():
     curs.execute(sql)
     all_video_ids = curs.fetchall()
     random.seed(video_id)
-    suffled = random.suffle(all_video_ids)
-    recommend_id1 = suffled[0]
-    recommend_id2 = suffled[1]
+    shuffled = random.shuffle(all_video_ids)
+    recommend_id1 = shuffled[0]
+    recommend_id2 = shuffled[1]
     if not comments:
         return 
     # payload = {'type':'analyze','videoId':video_id}
