@@ -139,7 +139,7 @@ def analyze():
     curs = conn.cursor(db.pymysql.cursors.DictCursor)
     sql  = "select recognize from searched_video"
     curs.execute(sql)
-    all_video_ids = curs.fetchall()
+    all_video_ids = [x['recognize'] for x in curs.fetchall()]
     random.seed(video_id)
     shuffled = random.shuffle(all_video_ids)
     recommend_id1 = shuffled[0]
