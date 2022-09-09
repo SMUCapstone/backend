@@ -39,9 +39,9 @@ class youtubeAPI:
         uploads = response['items'][0]['contentDetails']['relatedPlaylists']['uploads']
         # 결과값으로 나온 uploads 값을 이용.
         if pageToken:
-            response = self.api_obj.playlistItems().list(part='snippet', playlistId=uploads, pageToken = pageToken, maxResults = 30).execute()
+            response = self.api_obj.playlistItems().list(part='snippet', playlistId=uploads, pageToken = pageToken, maxResults = 50).execute()
         else:
-            response = self.api_obj.playlistItems().list(part='snippet', playlistId=uploads, maxResults = 30).execute()
+            response = self.api_obj.playlistItems().list(part='snippet', playlistId=uploads, maxResults = 50).execute()
         # if pageToken:
         #     response = self.api_obj.search().list(part='snippet', channelId=CID, pageToken = pageToken, order='viewCount', type='video', maxResults = 30).execute()
         # else:
