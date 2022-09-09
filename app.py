@@ -191,7 +191,7 @@ def popular():
     subscribers = chn_response['statistics'].get('subscriberCount','0')
 
     url = f'https://www.googleapis.com/youtube/v3/videos?id={video_id}&part=snippet&part=statistics&key={yt.api_key}'
-    vid_response = json.loads(requests.get(url).text)['items'][0]
+    vid_response = json.loads(requests.get(url).text)
     hits =  vid_response['items'][0]['statistics'].get('viewCount','0')
     comment_num =  vid_response['items'][0]['statistics'].get('commentCount','0')
     cid = vid_response['items'][0]['snippet'].get('channelId','0')
