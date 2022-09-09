@@ -104,6 +104,7 @@ def contents():
             result = yt.get_contents(channelId, pageToken)
         else:
             result = yt.get_contents(channelId)
+            db.searched_channel(channelId)
         # db.insert_db_cache(json.dumps(payload), json.dumps(result))
         return result
 
@@ -179,33 +180,40 @@ def analyze():
         'timestamp':find_timestamp(comments)
     }
     # db.insert_db_cache(json.dumps(payload), json.dumps(result))
+    db.searched_video(video_id)
     return result
 
 @app.route('/popular',methods=['GET'])
 def popular():
     # DB에서 channelId와 videoId를 꺼내온다
-    channel_id = ''
-    video_id = '' 
+    channel_id = db.most_searched_channel()
+    video_id = db.most_searched_video()
     url = f'https://www.googleapis.com/youtube/v3/channels?id={channel_id}&part=snippet&part=statistics&key={yt.api_key}'
-    # response = json.loads(requests.get(url).text)['items'][0]
-    # channel_name = response['snippet']['title']
-    # profile_img = response['snippet']['thumbnails']['high']['url']
-    # subscribers = response['statistics'].get('subscriberCount','0')
+    chn_response = json.loads(requests.get(url).text)['items'][0]
+    channel_name = chn_response['snippet']['title']
+    profile_img = chn_response['snippet']['thumbnails']['high']['url']
+    subscribers = chn_response['statistics'].get('subscriberCount','0')
+
+    vid_response = youtubeAPI.api_obj.videos().list(part='statistics, snippet', id=video_id).execute()
+    hits =  vid_response['items'][0]['statistics'].get('viewCount','0')
+    comment_num =  vid_response['items'][0]['statistics'].get('commentCount','0')
+    cid = vid_response['items'][0]['snippet'].get('channelId','0')
+    video_name = vid_response['items'][0]['snippet'].get('title','0')
     result = {
         'channel':{
-            'channelId': 'UC3SyT4_WLHzN7JmHQwKQZww',
-            'channelName': '이지금 [IU Official]',
-            'thumbnail': 'https://yt3.ggpht.com/ytc/AMLnZu-UWvwHCKwBxSfbMOjy5D2z03jrZz4hnOWyksk1gw=s88-c-k-c0x00ffffff-no-rj-mo',
-            'channelHits': '8050000' #혹시 채널 조회수도 얻을 수 있을까요?? 힘드시면 빼도 될 것 같아요
+            'channelId': channel_id,
+            'channelName': channel_name,
+            'thumbnail': profile_img,
+            'channelHits': subscribers #혹시 채널 조회수도 얻을 수 있을까요?? 힘드시면 빼도 될 것 같아요
         }, #많이 분석한 채널 객체
         'video':{
-            'cid': 'UC_gkwRB-p1JrOzzJk7PBKDQ',
-            'comment_num': '2861',
-            'hits': '6445799',
-            'id': 'fmn7aswQUdQ',
-            'thumbnail': 'https://i.ytimg.com/vi/fmn7aswQUdQ/hqdefault.jpg',
-            'video_name' : '한국 여자 직장인 출근룩 국룰 #shorts #lookbook #룩북 #패션',
-            'video_url': 'www.youtube.com/watch?=fmn7aswQUdQ'
+            'cid': cid,
+            'comment_num': comment_num,
+            'hits': hits,
+            'id': video_id,
+            'thumbnail': f'https://i.ytimg.com/vi/{video_id}/hqdefault.jpg',
+            'video_name' : video_name,
+            'video_url': f'www.youtube.com/watch?={video_id}'
         }
     }
     return result
