@@ -190,7 +190,7 @@ def popular():
     profile_img = chn_response['snippet']['thumbnails']['high']['url']
     subscribers = chn_response['statistics'].get('subscriberCount','0')
 
-    vid_response = youtubeAPI.api_obj.videos().list(part='statistics, snippet', id=video_id).execute()
+    vid_response = yt.api_obj.videos().list(part='statistics, snippet', id=video_id).execute()
     hits =  vid_response['items'][0]['statistics'].get('viewCount','0')
     comment_num =  vid_response['items'][0]['statistics'].get('commentCount','0')
     cid = vid_response['items'][0]['snippet'].get('channelId','0')
