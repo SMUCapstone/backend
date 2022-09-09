@@ -7,7 +7,7 @@ app = Flask(__name__)
 @app.route('/image', methods=['POST'])
 def save_image():
     f = request.files['file']
-    f.save('./saved/'+secure_filename(f.filename))
+    f.save('/home/images/'+secure_filename(f.filename))
     return 'done!'
 
 if __name__=='__main__':
