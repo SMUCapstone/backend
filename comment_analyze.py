@@ -1,4 +1,5 @@
 import re 
+import requests
 # 딕셔너리에 저장하기 ( {시간:[댓글]} )
 def remove_tag(string):
     string = re.sub(r'<[^>]*>', '', string) 
@@ -82,6 +83,9 @@ def make_wordcloud(comment_list, video_id):
     # plt.figure()
     # plt.imshow(gen)
     wc.to_file(f'{video_id}.png')
+    files = open(f'{video_id}.png', 'rb')
+    upload = {'file': files}
+    res = requests.post('http://34.64.56.32:3333/image/', files = upload)
     result = {}
     res = dict(c)
     for x in list(dict(sorted(res.items(), key=lambda x:x[1], reverse=True)).keys())[:100]:
