@@ -54,10 +54,10 @@ class youtubeAPI:
             'thumbnail': item['snippet']['thumbnails']['high']['url']} for item in response['items']]
         response = self.api_obj.videos().list(part='statistics', id=[x['id'] for x in resultArr]).execute()
         for i in range(len(response['items'])):
-            video_id = response['items']['id']
+            video_id = response['items'][i]['id']
             url = f'www.youtube.com/watch?v={video_id}'
-            hits =  response['items']['statistics'].get('viewCount','0')
-            comment_num =  response['items']['statistics'].get('commentCount','0')
+            hits =  response['items'][i]['statistics'].get('viewCount','0')
+            comment_num =  response['items'][i]['statistics'].get('commentCount','0')
             resultArr[i]['video_url']=url
             resultArr[i]['hits']=hits
             resultArr[i]['comment_num']=comment_num
