@@ -78,7 +78,7 @@ def make_wordcloud(comment_list, video_id):
     nouns = okt.nouns(text) # 명사만 추출
     words = [n for n in nouns if len(n) > 1] # 단어의 길이가 1개인 것은 제외
     c = Counter(words)
-    wc = WordCloud(font_path='malgun', width=600, height=400, scale=2.0, max_font_size=250, background_color='white')
+    wc = WordCloud(font_path='../NotoSansKR-Medium.otf', width=600, height=400, scale=2.0, max_font_size=250, background_color='white')
     gen = wc.generate_from_frequencies(c)
     # plt.figure()
     # plt.imshow(gen)
