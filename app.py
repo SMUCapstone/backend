@@ -140,8 +140,8 @@ def analyze():
     sql  = "select recognize from searched_video"
     curs.execute(sql)
     all_video_ids = curs.fetchall()
-    random.seed(90)
-    suffled = all_video_ids.suffle(video_id)
+    random.seed(video_id)
+    suffled = random.suffle(all_video_ids)
     recommend_id1 = suffled[0]
     recommend_id2 = suffled[1]
     if not comments:
