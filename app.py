@@ -6,6 +6,7 @@ import requests
 import json
 import pika
 from comment_analyze import *  
+import random
 
 class Publisher:
     def __init__(self):
@@ -133,8 +134,16 @@ def analyze():
     all_args = request.args.to_dict()
     video_id = all_args.get('videoId','')
     comments = [x[1] for x in yt.get_comment_and_likes_3000(video_id)]
-    recommend_id1 = 'N7E90Je0pTw'
-    recommend_id2 = 'MorC3Q5E69w'
+    # db에서 추천 비디오 랜덤 추출
+    conn = db.get_connection()
+    curs = conn.cursor(db.pymysql.cursors.DictCursor)
+    sql  = "select recognize from searched_video"
+    curs.execute(sql)
+    all_video_ids = curs.fetchall()
+    random.seed(90)
+    suffled = all_video_ids.suffle(video_id)
+    recommend_id1 = suffled[0]
+    recommend_id2 = suffled[1]
     if not comments:
         return 
     # payload = {'type':'analyze','videoId':video_id}
