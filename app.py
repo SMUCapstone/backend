@@ -170,7 +170,7 @@ def analyze():
             'neg':12
         },
         'bigdata':{
-            'image':'https://lh3.googleusercontent.com/fife/AAbDypD5uowlKKYO1FnE85SLeyZOc9j6RE1ymyhOUsd8mDyQ3spHFp9kuMyB8XDEBCtewhKC7aewDgaH4WG7hTCvN0wh3zqEppfjyujHVEF8vVk2GdMJt5qgSd9D3qAQz2THhIzL5umSxmz_JXGzm-V1vjDPGb8YZ4OnADTxaxY8d52XhUwDT5f5t9sDVmT0T81Kw2Bpz3hRgTtFBKbJgEtF14PtKd2r49S6UmcwR2gInqNUq0PnKlX7TycmjOqTAo8rGVj8R1aLR9J5V8iMlFLpWaVdd3XJdplcXAJiXTUc0JoQD8g2DVGlelYIl0qxExjnMGl9yMSg1sq1veeH5jqHlbwb5H-ni-_42tRZVaeaEimnOS41L4JxOeYE0xdt-uDvCu-eo4atoTe92w9DtuVQ0KEBZFEsMaimNit-MNUGyxOKMWFiiuCkUlH2dvXZt7LIcWSwYhrhMG1FHEUp_28RqRfqs6x-KhlX0Z0XC45rlmxHc1pL1MBScjJCSpIHn_P8sV6iHghQ1cwKU85eI-GLTb3lmBPG7eiLU04CJXEUGJGLt9OxwiHg51-17kquNelIoU8zo1N5XYCuHJ_UimgKQgFbN6RpT_HJhCDP1NttgSTC3bYTLcbLwDdq-2sIOuILikQCd0Vau998o_puLzlflgUT-MPs0dvbBCbesyrkhNG46VvjalctM2TNCwo7RpR53X73tW4ziGnNnSccc2JKcJC_e3Ye5XfV2aQQPduyywEFsQhzL0dcp_oNm-GnHO0Ljs1PYhDaH_w4e94CjHGth20sZbBzkyUcOj2_oABDeysMpiODVxbYV1Y7gZGZvIp_PKyMEyXmRRjZ_Hyr4YcdepKhqaoJAvETAG7qYi4MtbuRzpHlk0uLSZwoD3fbUIl77m-jjpLI2aNgZo94pjOzengyM4Cg4U3VvUXWRwYC438wIm_GTsINzRR9d-mjQp2zSZvrOYdWPgNcxlocMHS_tW9IadLWNG2HOnqNUdAbtmFJ4d9HhTBoYxaWtXDYV6Yge2U6Y8G1PusDlrvqz0ciUKcyWFpIl2WLdRA6JreG3K_4HzEgBq5ITaMGQolOWaBSqDPiIv-gFu4jGheZzphrTC3juLuCzJXjxkxKXhvM7Dtnz4x47po1DLAFTSnOT6Jehavh9GjfwWKhYs0uolFYSogx7_xBN4GKg9FpOji5zvK4JiNi5caEFJ8EuhtVEc1J37CMlWdjoSZ5Cwt8CBsNTJvcLyMt36xc5Fuz25lCy1D6ekgVwAikXUAwktXejaLdx9USSKuZr50nCxJAzxayMcH3VI7QmoFFi09TBjgIcuw=w1875-h895',
+            'image':f'http://34.64.56.32:13333/{video_id}.png',
             'comments':make_wordcloud(comments, video_id)
         },
         'timestamp':find_timestamp(comments)
