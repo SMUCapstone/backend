@@ -5,7 +5,6 @@ from youtubeAPI import youtubeAPI
 import requests
 import json
 import pika
-from comment_analyze import *  
 import random
 
 class Publisher:
@@ -164,16 +163,7 @@ def analyze():
                 'thumb':f'https://i.ytimg.com/vi/{recommend_id2}/hqdefault.jpg',
                 'url':f'https://www.youtube.com/watch?v={recommend_id2}'
             }
-        ],
-        'sentimental':{
-            'pos':88,
-            'neg':12
-        },
-        'bigdata':{
-            'image':f'http://34.64.56.32:13333/{video_id}.png',
-            'comments':make_wordcloud(comments, video_id)
-        },
-        'timestamp':find_timestamp(comments)
+        ]
     }
     # db.insert_db_cache(json.dumps(payload), json.dumps(result))
     db.searched_video(video_id)
