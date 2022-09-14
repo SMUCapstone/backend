@@ -186,6 +186,12 @@ def popular():
     comment_num =  vid_response['items'][0]['statistics'].get('commentCount','0')
     cid = vid_response['items'][0]['snippet'].get('channelId','0')
     video_name = vid_response['items'][0]['snippet'].get('title','0')
+
+    url = f'https://www.googleapis.com/youtube/v3/channels?id={cid}&part=snippet&part=statistics&key={yt.api_key}'
+    chn_response2 = json.loads(requests.get(url).text)['items'][0]
+    channel_name2 = chn_response2['snippet']['title']
+    profile_img2 = chn_response2['snippet']['thumbnails']['high']['url']
+    subscribers2 = chn_response2['statistics'].get('subscriberCount','0')
     result = {
         'channel':{
             'channelId': channel_id,
@@ -194,6 +200,10 @@ def popular():
             'channelHits': subscribers #혹시 채널 조회수도 얻을 수 있을까요?? 힘드시면 빼도 될 것 같아요
         }, #많이 분석한 채널 객체
         'video':{
+            'channelInfo':{
+                'thumbnail':profile_img2,
+                'channelName':channel_name2
+            },
             'cid': cid,
             'comment_num': comment_num,
             'hits': hits,
