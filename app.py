@@ -78,6 +78,19 @@ def search():
     db.insert_db_cache(json.dumps(payload),json.dumps({'items':result}))
     return {'items':result}
 
+@app.route('/channels2')
+def search2():
+    all_args = request.args.to_dict()
+    query = all_args.get('q','')
+    data = db.getYoutuber()
+    result = []
+    for i in range(len(data.id)):
+        result.append({'channelId':data.id[i], 'channelname':data.channel[i], 'thumbnail':data.profile[i]})
+    random.seed(query)
+    random.shuffle(result)
+
+    return {'items': result[:5]}
+
 
 @app.route('/contents',methods=['GET', 'POST', 'DELETE'])
 def contents():
