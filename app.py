@@ -2,6 +2,7 @@ from flask import Flask, request
 from flask_cors import CORS
 import Database as db
 from youtubeAPI import youtubeAPI
+from comment_analyze import *  
 import requests
 import json
 import pika
@@ -176,7 +177,12 @@ def analyze():
                 'thumb':f'https://i.ytimg.com/vi/{recommend_id2}/hqdefault.jpg',
                 'url':f'https://www.youtube.com/watch?v={recommend_id2}'
             }
-        ]
+        ],
+        'bigdata':{
+            'image':f'http://34.64.56.32:13333/{video_id}.png',
+            'comments':make_wordcloud(comments, video_id)
+        },
+        'timestamp':find_timestamp(comments)
     }
     # db.insert_db_cache(json.dumps(payload), json.dumps(result))
     db.searched_video(video_id)
