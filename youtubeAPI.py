@@ -173,7 +173,7 @@ class youtubeAPI:
                     response = api_obj.commentThreads().list(part='snippet,replies', videoId=video_id, order = 'relevance', pageToken=response['nextPageToken'], maxResults=100).execute()
                 else:
                     response = ''
-                return data
+            return data
         except:
             return 'error'
 
