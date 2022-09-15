@@ -145,7 +145,7 @@ class youtubeAPI:
 
         api_obj = self.api_obj
         data = []
-        response = api_obj.commentThreads().list(part='snippet,replies', videoId=video_id, maxResults=100).execute()
+        response = api_obj.commentThreads().list(part='snippet,replies', videoId=video_id, order = 'relevance', maxResults=100).execute()
         try:
             while response:
                 for item in response['items']:
@@ -170,7 +170,7 @@ class youtubeAPI:
             
                 if 'nextPageToken' in response:
                     pageToken =  response['nextPageToken']
-                    response = api_obj.commentThreads().list(part='snippet,replies', videoId=video_id, pageToken=response['nextPageToken'], maxResults=100).execute()
+                    response = api_obj.commentThreads().list(part='snippet,replies', videoId=video_id, order = 'relevance', pageToken=response['nextPageToken'], maxResults=100).execute()
                 else:
                     response = ''
                 return data
