@@ -30,6 +30,6 @@ class Consumer:
         return
 
 
-yt = youtubeAPI('AIzaSyCEwR4BXNL_ZxJgy6JTBcu2_wYuwS3RnDo')
+yt = youtubeAPI('발급받은 api키')
 consumer = Consumer()
 consumer.consume()

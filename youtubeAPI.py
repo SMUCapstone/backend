@@ -178,9 +178,8 @@ class youtubeAPI:
             return 'error'
 
 
-if __name__=="__main__":
-    # api_key = 'AIzaSyCEwR4BXNL_ZxJgy6JTBcu2_wYuwS3RnDo'    
-    api_key = 'AIzaSyBug-zl91U0prwpaI2LgBIg_UHQrv5DP8A'     ## 발급받은 api 키
+if __name__=="__main__":   
+    api_key = '발급받은 api 키'     ## 발급받은 api 키
     video_id = 'kLUAqWu3YzU'                                ## 동영상 id watch?v= 다음
     api = youtubeAPI(api_key)
     api.get_comment_and_likes()
